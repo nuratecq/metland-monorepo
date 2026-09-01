@@ -1,6 +1,8 @@
 import * as jose from "jose";
 import bcrypt from "bcryptjs";
 
+export * from "./permissions";
+
 const ALG = "HS256";
 const ISS = "metland";
 const DEFAULT_EXPIRES = "7d";
