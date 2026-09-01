@@ -30,7 +30,7 @@ export default async function Dashboard() {
         <p className="text-sm text-[var(--color-on-surface-variant)]">Operational overview — Plan → Execute → Monitor → Report</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiTile label="Total Projects" value={kpi.total} sub={`${kpi.active} active`} />
         <KpiTile label="Delayed" value={kpi.delayed} sub="health RED" />
         <KpiTile label="At Risk" value={kpi.atRisk} sub="health YELLOW" />
@@ -58,7 +58,7 @@ export default async function Dashboard() {
             <p>✅ Milestones & Tasks per project</p>
             <p>✅ Issues & schedule pages</p>
             <p>✅ Dashboard KPI aggregation</p>
-            <p>Try: <code>POST /api/projects {"{"} name: "Metland X" {"}"}</code></p>
+            <p>Try: <code>POST /api/projects {"{"} name: &quot;Metland X&quot; {"}"}</code></p>
           </CardContent>
         </Card>
       </div>

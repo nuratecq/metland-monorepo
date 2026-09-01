@@ -25,7 +25,8 @@ export function InlineCreate({ projectId }: { projectId: string }) {
   }
 
   return (
-    <div className="bg-white border rounded-lg p-4 space-y-3">
+    <div className="bg-white border border-[var(--color-outline-variant)] rounded p-4 space-y-3">
+      <div className="font-semibold" style={{ fontFamily: "var(--font-hanken)" }}>Tambah milestone / task</div>
       <div className="flex gap-2">
         <button onClick={() => setTab("milestone")} className={`px-3 py-1 rounded text-sm border ${tab === "milestone" ? "bg-[var(--color-primary)] text-white" : "bg-white"}`}>Milestone</button>
         <button onClick={() => setTab("task")} className={`px-3 py-1 rounded text-sm border ${tab === "task" ? "bg-[var(--color-primary)] text-white" : "bg-white"}`}>Task</button>

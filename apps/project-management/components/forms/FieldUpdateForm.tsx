@@ -18,8 +18,8 @@ export function FieldUpdateForm({ projectId, onDone }: { projectId: string; onDo
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3 bg-white border rounded-lg p-4">
-      <div className="font-semibold text-sm">Field Update — docs/PRD.md:478</div>
+    <form onSubmit={onSubmit} className="space-y-3 bg-white border border-[var(--color-outline-variant)] rounded p-4">
+      <div className="font-semibold" style={{ fontFamily: "var(--font-hanken)" }}>Unggah progres</div>
       <div><label className="text-xs font-semibold tracking-widest uppercase">Progress 0-100</label><input name="progress" type="range" min={0} max={100} defaultValue={50} className="w-full" /></div>
       <div><label className="text-xs font-semibold tracking-widest uppercase">Note</label><textarea name="note" className="w-full border rounded px-3 py-2 text-sm" placeholder="Pekerjaan pondasi sisi timur selesai" rows={2} /></div>
       <button disabled={loading} className="bg-[var(--color-primary)] text-white px-4 py-2 rounded text-sm">{loading ? "..." : "Submit Field Update"}</button>
