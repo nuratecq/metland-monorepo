@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // Phase 0: passthrough — Phase 0.4 will enforce verifySession on protected routes
-export function middleware(_req: NextRequest) {
+export default function proxy(_req: NextRequest) {
   return NextResponse.next();
 }
 

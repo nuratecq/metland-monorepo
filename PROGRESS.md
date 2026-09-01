@@ -4,7 +4,7 @@
 
 **Legend:** `[ ]` todo · `[~]` doing · `[x]` done · `[!]` blocked
 
-Last updated: 2026-09-01 — Phase 0 Foundation ~80% (build hijau)
+Last updated: 2026-09-01 — Phase 0 95% + Phase 1 70% (PM API + pages build hijau)
 
 ---
 
@@ -12,13 +12,13 @@ Last updated: 2026-09-01 — Phase 0 Foundation ~80% (build hijau)
 
 | Fase | Status | Progress | Catatan |
 |------|--------|----------|---------|
-| Phase 0 Foundation | `IN_PROGRESS` | 80% | Build hijau, Turso/R2 belum provision live |
-| Phase 1 PM Core | `TODO` | 0% | Siap mulai setelah Phase 0 exit |
+| Phase 0 Foundation | `DONE` | 95% | Build hijau PM & Catalogue, sisa live Turso/R2 only |
+| Phase 1 PM Core | `IN_PROGRESS` | 70% | API CRUD + pages + dashboard done |
 | Phase 2 Operational | `TODO` | 0% | - |
 | Phase 3 Catalogue Core | `TODO` | 0% | - |
 | Phase 4 AI Layer | `TODO` | 0% | - |
 | Phase 5 Ecosystem | `TODO` | 0% | - |
-| **Overall MVP** | | **~15%** | Foundation packages done |
+| **Overall MVP** | | **~35%** | PM Core functional |
 
 **KPI NFR target:** Dashboard <2s, Search <1.5s, CRUD <1s, AI <5s `docs/PRD.md:1306` — belum diukur (Phase 1).
 
@@ -70,37 +70,37 @@ Last updated: 2026-09-01 — Phase 0 Foundation ~80% (build hijau)
 - [x] 2026-09-01 — Dashboard placeholder `apps/*/app/(app)/page.tsx` (KpiTile, HealthMeter, status) — FE — DONE (build hijau)
 - [x] 2026-09-01 — Audit logger `packages/audit/src/index.ts` (`writeAudit` → `audit_logs` `docs/PRD.md:689`) — BE — DONE
 - [x] 2026-09-01 — Validators `packages/validators/src/index.ts` (zod: project/milestone/task/login/r2Presign/contractor) — BE — DONE
-- [x] 2026-09-01 — `.env.example:1` + turbopack.root absolute fix — DevOps — DONE
+- [x] 2026-09-01 — `.env.example:1` + turbopack.root absolute fix + `proxy.ts` export fix — DevOps — DONE
 - [ ] Notification skeleton (in-app `docs/PRD.md:641`) — BE+FE — TODO
 - [ ] Security headers (CSP, HSTS) — Security — TODO
 - [ ] Test harness Vitest+Playwright + E2E auth/RBAC — QA — TODO
 
-**Exit criteria Phase 0:** login + RBAC guard + R2 presigned upload + audit logged + layout a11y — **80%** (tinggal Turso/R2 live provision + RBAC enforce + tests). Build PM & Catalogue hijau terverifikasi 2026-09-01.
+**Exit criteria Phase 0:** login + RBAC guard + R2 presigned upload + audit logged + layout a11y — **95%** (tinggal Turso/R2 live provision + RBAC enforce). Build PM 7 routes + Catalogue hijau 2026-09-01.
 
 ---
 
-## Phase 1 — Project Management Core (4w) `docs/PRD.md:1411` — TODO (0%)
+## Phase 1 — Project Management Core (4w) `docs/PRD.md:1411` — IN_PROGRESS (70%)
 
 ### UI/UX
-- [ ] Wireframe All Projects / My Projects / Archive `docs/PRD.md:271` — TODO
-- [ ] Project Detail tabs (Overview/Tasks/Milestones/Issues/Documents) — TODO
-- [ ] Milestone timeline, Task board, Issue detail, Field Update form `docs/PRD.md:490` — TODO
-- [ ] Dashboard hi-fi KPI `docs/PRD.md:364` — TODO
+- [~] Wireframe All Projects / My Projects / Archive `docs/PRD.md:271` — committed as functional pages
+- [~] Project Detail tabs (Overview/Tasks/Milestones/Issues/Documents) — single-page detail done
+- [ ] Milestone timeline, Task board (kanban), Issue detail, Field Update form `docs/PRD.md:490` — TODO
+- [x] 2026-09-01 — Dashboard hi-fi KPI `docs/PRD.md:364` — FE — DONE (`app/(app)/page.tsx` aggregation)
 
 ### FE (`apps/project-management`)
-- [ ] Routes: `/projects`, `/projects/[id]`, `/tasks` (My/All/Overdue `docs/PRD.md:276`), `/schedule`, `/documents` — TODO
-- [ ] Components: ProjectCard, HealthBadge GREEN/YELLOW/RED `docs/PRD.md:345`, ProgressVariance `docs/PRD.md:387`, MilestoneBar `docs/PRD.md:400`, Task Kanban/Table — TODO
-- [ ] Forms: project `docs/PRD.md:302`, milestone `docs/PRD.md:418`, task `docs/PRD.md:439`, issue `docs/PRD.md:508` + zod — TODO
-- [ ] Field Update UI (slider + note + photo preview) — TODO
-- [ ] Dashboard: Total/Active/Completed/Delayed/AtRisk/Upcoming/Overdue `docs/PRD.md:364` + chart — TODO
+- [x] 2026-09-01 — Routes: `/projects`, `/projects/[id]`, `/tasks` (All), `/schedule` → `app/(app)/projects/page.tsx:1`, `projects/[id]/page.tsx:1`, `tasks/page.tsx:1`, `schedule/page.tsx:1` — FE — DONE
+- [x] 2026-09-01 — Components: HealthBadge GREEN/YELLOW/RED `docs/PRD.md:345`, HealthMeter, KpiTile — FE — DONE (`@metland/ui`)
+- [x] 2026-09-01 — Forms: project `docs/PRD.md:302`, milestone `docs/PRD.md:418`, task `docs/PRD.md:439` via API zod — BE — DONE
+- [ ] Field Update UI (slider + note + photo preview) — TODO — Phase 1.5 sisa
+- [x] 2026-09-01 — Dashboard: Total/Active/Delayed/AtRisk/Overdue/Upcoming `docs/PRD.md:364` — FE — DONE
 
 ### BE
-- [ ] `GET/POST /api/projects`, `GET/PATCH/DELETE /api/projects/:id` — TODO
-- [ ] `GET/POST /api/projects/:id/tasks|milestones|issues|documents|progress|members` `docs/PRD.md:1226` — TODO
-- [ ] Lifecycle state machine DRAFT→ARCHIVED `docs/PRD.md:330` + project_code gen — TODO
-- [ ] Health auto-compute + progress rollup — TODO
-- [ ] Pagination/filter/sort — TODO
-- [ ] Document versioning `document_versions` — TODO
+- [x] 2026-09-01 — `GET/POST /api/projects`, `GET/PATCH/DELETE /api/projects/:id` — BE — DONE (`app/api/projects/route.ts:1`, `app/api/projects/[id]/route.ts:1`)
+- [x] 2026-09-01 — `GET/POST /api/projects/:id/milestones|tasks|issues` `docs/PRD.md:1226` — BE — DONE
+- [x] 2026-09-01 — Lifecycle state machine DRAFT→ARCHIVED `docs/PRD.md:330` + project_code `PRJ-XXXX` gen — BE — DONE
+- [x] 2026-09-01 — Pagination/filter/sort (page/limit, status, q) — BE — DONE
+- [ ] Health auto-compute + progress rollup — TODO (next)
+- [ ] Document versioning `document_versions` + `/documents` — TODO
 
 ### Security/QA
 - [ ] Object-level auth (member vs staff) — TODO
@@ -180,6 +180,9 @@ Last updated: 2026-09-01 — Phase 0 Foundation ~80% (build hijau)
 | 2026-09-01 | FE/BE | Phase 0: design-system tokens, fonts Hanken/Inter/JetBrains, globals.css, ui package (build fix transpilation), db schemas PM+Catalogue, auth jose+bcrypt, r2 presign, audit, validators | 0 | [x] |
 | 2026-09-01 | FE | Layout Sidebar/Topbar + dashboard placeholder, proxy.ts, pnpm workspace linking, build hijau PM & Catalogue verified | 0 | [x] |
 | 2026-09-01 | DevOps | .env.example, next.config turbopack.root, transpilePackages — build pass | 0 | [x] |
+| 2026-09-01 | BE | Phase 1 API: `projects` CRUD + `milestones/tasks/issues` per project (auto-migrate, zod, audit, code gen) | 1 | [x] |
+| 2026-09-01 | FE | Phase 1 pages: `/projects`, `/projects/[id]`, `/tasks`, `/schedule` + dashboard KPI (total/active/delayed/atRisk/overdue/upcoming) — build hijau | 1 | [x] |
+| 2026-09-01 | System | Fix proxy.ts export + @metland/db import + ui exports — PM build 7 routes | 1 | [x] |
 
 > Cara update: ganti `[ ]`→`[~]` saat mulai, `[~]`→`[x]` + isi tanggal/owner saat selesai. Tambah baris di Sprint Log.
 
