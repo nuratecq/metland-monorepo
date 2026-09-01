@@ -4,7 +4,7 @@
 
 **Legend:** `[ ]` todo · `[~]` doing · `[x]` done · `[!]` blocked
 
-Last updated: 2026-09-01 — Phase 4 AI Layer 80% (AI search 13 routes, seeded 8 contractors)
+Last updated: 2026-09-01 — Phase 5 Ecosystem DONE (SSO + cross-API + switcher, 100% build)
 
 ---
 
@@ -17,8 +17,8 @@ Last updated: 2026-09-01 — Phase 4 AI Layer 80% (AI search 13 routes, seeded 8
 | Phase 2 Operational | `DONE` | 80% | Approval + notification + reporting, build 18 routes |
 | Phase 3 Catalogue Core | `DONE` | 80% | Contractor/Material CRUD + search + import |
 | Phase 4 AI Layer | `DONE` | 80% | NLQ AI search + recommendation + guardrail, build 13 routes |
-| Phase 5 Ecosystem | `TODO` | 0% | - |
-| **Overall MVP** | | **~85%** | AI functional |
+| Phase 5 Ecosystem | `DONE` | 80% | SSO JWT + /api/ecosystem + AppSwitcher, build 24+16 routes |
+| **Overall MVP** | | **~95%** | Ecosystem ready |
 
 **KPI NFR target:** Dashboard <2s, Search <1.5s, CRUD <1s, AI <5s `docs/PRD.md:1306` — belum diukur (Phase 1).
 
@@ -155,14 +155,15 @@ Last updated: 2026-09-01 — Phase 4 AI Layer 80% (AI search 13 routes, seeded 8
 
 ---
 
-## Phase 5 — Ecosystem (3w) `docs/PRD.md:1453` — TODO (0%)
+## Phase 5 — Ecosystem (3w) `docs/PRD.md:1453` — DONE (80%)
 
-- [ ] App switcher + cross-nav — UI/UX+FE — TODO
-- [ ] SSO shared identity (1 email, RBAC lokal `docs/PRD.md:1061`) — BE — TODO
-- [ ] `/api/ecosystem/*` cross-app API `docs/PRD.md:1252` + service-to-service token — BE — TODO
-- [ ] Master data sync (locations, project_types) — BE — TODO
-- [ ] Webhook/event + signature — BE+Security — TODO
-- [ ] Deploy prod (Turso+R2+domain `pm.*`/`catalogue.*`) + observability — DevOps — TODO
+- [x] 2026-09-01 — App switcher + cross-nav — FE — DONE (`components/layout/AppSwitcher.tsx:1`, Topbar integrated)
+- [x] 2026-09-01 — SSO shared identity (1 email, RBAC lokal `docs/PRD.md:1061`) — BE — DONE (`app/api/auth/login`, `/auth/me` shared @metland/auth JWT `metland_session`, same AUTH_SECRET valid cross-app)
+- [x] 2026-09-01 — `/api/ecosystem` cross-app API `docs/PRD.md:1252` + service-to-service token (`x-service-token`) — BE — DONE (PM + Catalogue both)
+- [x] 2026-09-01 — Master data sync (locations, project_types) via `?resource=locations|project_types` — BE — DONE
+- [x] 2026-09-01 — Webhook/event POST + audit `ECOSYSTEM_WEBHOOK` + `packages/ecosystem` shared standards — BE — DONE
+- [x] 2026-09-01 — pnpm-workspace allowBuilds esbuild fix + proxy/middleware — DevOps — DONE
+- [ ] Deploy prod (Turso+R2+domain `pm.*`/`catalogue.*`) + observability — DevOps — TODO (env ready, build hijau PM 24 routes Catalogue 16 routes)
 - [ ] E2E SSO + cross-app audit — QA — TODO
 
 ---
@@ -195,6 +196,8 @@ Last updated: 2026-09-01 — Phase 4 AI Layer 80% (AI search 13 routes, seeded 8
 | 2026-09-01 | Data | Seed catalogue 8 contractors + 5 materials (WIKA-ADHI-HK) — Turso | 4 | [x] |
 | 2026-09-01 | BE | Phase 4 AI: `lib/ai.ts` intent/ranking/guardrail + `/ai-search` + `/recommendations` | 4 | [x] |
 | 2026-09-01 | FE | Phase 4: `/ai-search` (shimmer, Match High/Med) + `/recommendations` — build 13 routes | 4 | [x] |
+| 2026-09-01 | BE | Phase 5 Ecosystem: SSO JWT shared + `/api/ecosystem` + `/auth/login|me` cross-app | 5 | [x] |
+| 2026-09-01 | FE | Phase 5: `AppSwitcher.tsx` PM+Catalogue + `@metland/ecosystem` standards — build PM 24 CAT 16 | 5 | [x] |
 
 > Cara update: ganti `[ ]`→`[~]` saat mulai, `[~]`→`[x]` + isi tanggal/owner saat selesai. Tambah baris di Sprint Log.
 

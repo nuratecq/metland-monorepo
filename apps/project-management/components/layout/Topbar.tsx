@@ -1,8 +1,12 @@
 import Link from "next/link";
+import { AppSwitcher } from "./AppSwitcher";
 export function Topbar() {
   return (
     <header className="h-14 border-b border-[var(--color-outline-variant)] bg-white flex items-center justify-between px-4">
-      <div className="text-sm text-[var(--color-on-surface-variant)]">Project Management — Operational</div>
+      <div className="flex items-center gap-3">
+        <div className="text-sm text-[var(--color-on-surface-variant)]">Project Management — Operational</div>
+        <AppSwitcher />
+      </div>
       <div className="flex items-center gap-3">
         <Link href="/notifications" className="text-sm">🔔</Link>
         <Link href="/approvals" className="text-sm border rounded px-2 py-0.5">Approvals</Link>
