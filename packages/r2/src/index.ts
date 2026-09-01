@@ -1,11 +1,15 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { randomUUID } from "crypto";
 
-// lazy import to avoid hard dep — only needed when actually presigning
+// lazy - use eval to avoid turbopack static resolution when not installed
 async function getSignedUrl(client: S3Client, cmd: unknown, opts: { expiresIn: number }): Promise<string> {
-  const mod = await import("@aws-sdk/s3-presigner").catch(() => null as unknown as { getSignedUrl: typeof import("@aws-sdk/s3-presigner").getSignedUrl });
-  if (!mod) throw new Error("@aws-sdk/s3-presigner not installed — run pnpm add @aws-sdk/s3-presigner in packages/r2");
-  return (mod as { getSignedUrl: (c: S3Client, cmd: unknown, o: { expiresIn: number }) => Promise<string> }).getSignedUrl(client, cmd as never, opts);
+  const dynImport = (0, eval)("import");
+  try {
+    const mod = (await dynImport("@aws-sdk/s3-presigner")) as { getSignedUrl: (c: S3Client, cmd: unknown, o: { expiresIn: number }) => Promise<string> };
+    return mod.getSignedUrl(client, cmd as never, opts);
+  } catch {
+    throw new Error("@aws-sdk/s3-presigner not installed — install it in packages/r2 to enable presign");
+  }
 }
 
 export function createR2Client() {

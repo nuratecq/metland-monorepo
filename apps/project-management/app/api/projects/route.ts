@@ -30,6 +30,8 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(100, Number(searchParams.get("limit") ?? 20));
   const offset = (page - 1) * limit;
 
+  // RBAC note: Phase 1 object-level auth stub — future: filter by membership via x-user-id header / session
+  const userId = req.headers.get("x-user-id");
   let sql = "SELECT * FROM projects WHERE 1=1";
   const args: unknown[] = [];
   if (status) {
@@ -40,6 +42,8 @@ export async function GET(req: NextRequest) {
     sql += " AND (name LIKE ? OR project_code LIKE ?)";
     args.push(`%${q}%`, `%${q}%`);
   }
+  // TODO Phase 2: if userId && role === Field Staff, filter to assigned projects
+  void userId;
   sql += " ORDER BY created_at DESC LIMIT ? OFFSET ?";
   args.push(limit, offset);
 

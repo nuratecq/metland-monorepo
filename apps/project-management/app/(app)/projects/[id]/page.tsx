@@ -1,5 +1,7 @@
 import { getDb } from "@/lib/turso";
 import { Card, CardContent, CardHeader, Badge, HealthMeter } from "@metland/ui";
+import { FieldUpdateForm } from "@/components/forms/FieldUpdateForm";
+import { InlineCreate } from "@/components/forms/InlineCreate";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +62,11 @@ export default async function ProjectDetail({ params }: { params: Promise<{ id: 
             })}
           </CardContent>
         </Card>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-4">
+        <InlineCreate projectId={id} />
+        <FieldUpdateForm projectId={id} />
       </div>
     </div>
   );

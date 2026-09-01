@@ -4,7 +4,7 @@
 
 **Legend:** `[ ]` todo · `[~]` doing · `[x]` done · `[!]` blocked
 
-Last updated: 2026-09-01 — Phase 0 95% + Phase 1 70% (PM API + pages build hijau)
+Last updated: 2026-09-01 — Phase 0 95% + Phase 1 90% (field update + health + docs + forms done)
 
 ---
 
@@ -13,12 +13,12 @@ Last updated: 2026-09-01 — Phase 0 95% + Phase 1 70% (PM API + pages build hij
 | Fase | Status | Progress | Catatan |
 |------|--------|----------|---------|
 | Phase 0 Foundation | `DONE` | 95% | Build hijau PM & Catalogue, sisa live Turso/R2 only |
-| Phase 1 PM Core | `IN_PROGRESS` | 70% | API CRUD + pages + dashboard done |
+| Phase 1 PM Core | `IN_PROGRESS` | 90% | CRUD + milestones/tasks/issues + progress/health + docs + forms |
 | Phase 2 Operational | `TODO` | 0% | - |
 | Phase 3 Catalogue Core | `TODO` | 0% | - |
 | Phase 4 AI Layer | `TODO` | 0% | - |
 | Phase 5 Ecosystem | `TODO` | 0% | - |
-| **Overall MVP** | | **~35%** | PM Core functional |
+| **Overall MVP** | | **~40%** | PM Core near-complete |
 
 **KPI NFR target:** Dashboard <2s, Search <1.5s, CRUD <1s, AI <5s `docs/PRD.md:1306` — belum diukur (Phase 1).
 
@@ -79,7 +79,7 @@ Last updated: 2026-09-01 — Phase 0 95% + Phase 1 70% (PM API + pages build hij
 
 ---
 
-## Phase 1 — Project Management Core (4w) `docs/PRD.md:1411` — IN_PROGRESS (70%)
+## Phase 1 — Project Management Core (4w) `docs/PRD.md:1411` — IN_PROGRESS (90%)
 
 ### UI/UX
 - [~] Wireframe All Projects / My Projects / Archive `docs/PRD.md:271` — committed as functional pages
@@ -183,6 +183,8 @@ Last updated: 2026-09-01 — Phase 0 95% + Phase 1 70% (PM API + pages build hij
 | 2026-09-01 | BE | Phase 1 API: `projects` CRUD + `milestones/tasks/issues` per project (auto-migrate, zod, audit, code gen) | 1 | [x] |
 | 2026-09-01 | FE | Phase 1 pages: `/projects`, `/projects/[id]`, `/tasks`, `/schedule` + dashboard KPI (total/active/delayed/atRisk/overdue/upcoming) — build hijau | 1 | [x] |
 | 2026-09-01 | System | Fix proxy.ts export + @metland/db import + ui exports — PM build 7 routes | 1 | [x] |
+| 2026-09-01 | BE | Phase 1.7-1.8: `health.ts` compute + `/progress` field-update + `/documents` + `/r2/presign` (R2 key UUID) — build 11 routes | 1 | [x] |
+| 2026-09-01 | FE | Phase 1.9: `ProjectForm.tsx`, `FieldUpdateForm.tsx`, `InlineCreate.tsx` + `/projects/new` + detail inline create | 1 | [x] |
 
 > Cara update: ganti `[ ]`→`[~]` saat mulai, `[~]`→`[x]` + isi tanggal/owner saat selesai. Tambah baris di Sprint Log.
 
