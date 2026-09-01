@@ -1,0 +1,12 @@
+@import "tailwindcss";
+@import "./css-variables.css";
+
+@theme inline {
+  --color-primary: var(--color-primary);
+  --color-on-primary: var(--color-on-primary);
+  --color-surface: var(--color-surface);
+  --color-background: var(--color-background);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-hanken);
+  --font-mono: var(--font-jetbrains);
+}

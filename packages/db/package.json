@@ -1,0 +1,19 @@
+{
+  "name": "@metland/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./pm": "./src/pm.ts",
+    "./catalogue": "./src/catalogue.ts",
+    "./client": "./src/client.ts"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.0",
+    "drizzle-orm": "^0.38.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.30.0",
+    "typescript": "^5.9.2"
+  }
+}

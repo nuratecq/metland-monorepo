@@ -1,0 +1,69 @@
+/* Metland Kinetic System — CSS Variables */
+:root {
+  /* surfaces */
+  --color-surface: #f6faf9;
+  --color-surface-dim: #d6dbda;
+  --color-surface-bright: #f6faf9;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f0f4f4;
+  --color-surface-container: #eaefee;
+  --color-surface-container-high: #e4e9e8;
+  --color-surface-container-highest: #dfe3e3;
+  --color-on-surface: #171d1c;
+  --color-on-surface-variant: #3d4949;
+  --color-inverse-surface: #2c3131;
+  --color-inverse-on-surface: #edf2f1;
+  --color-outline: #6d7979;
+  --color-outline-variant: #bcc9c8;
+  --color-surface-tint: #006a6a;
+
+  /* primary */
+  --color-primary: #006767;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #008282;
+  --color-on-primary-container: #f3fffe;
+  --color-inverse-primary: #6fd7d6;
+
+  /* secondary / tertiary / error */
+  --color-secondary: #545f73;
+  --color-secondary-container: #d5e0f8;
+  --color-tertiary: #8f4922;
+  --color-tertiary-container: #ad6038;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+
+  /* fixed */
+  --color-primary-fixed: #8cf3f3;
+  --color-primary-fixed-dim: #6fd7d6;
+  --color-on-primary-fixed: #002020;
+
+  /* background */
+  --color-background: #f6faf9;
+  --color-on-background: #171d1c;
+  --color-surface-variant: #dfe3e3;
+
+  /* status */
+  --color-status-green: #10b981;
+  --color-status-yellow: #f59e0b;
+  --color-status-red: #ef4444;
+  --color-status-blue: #3b82f6;
+  --color-data-mono: #64748b;
+
+  /* spacing */
+  --spacing-unit: 4px;
+  --spacing-gutter-dense: 12px;
+  --spacing-gutter-discovery: 24px;
+
+  /* radius */
+  --radius-sm: 0.125rem;
+  --radius: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  /* fonts - set via next/font variables */
+  --font-display: var(--font-hanken);
+  --font-body: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+}

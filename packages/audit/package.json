@@ -1,0 +1,8 @@
+{
+  "name": "@metland/audit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@libsql/client": "^0.15.0" }
+}
