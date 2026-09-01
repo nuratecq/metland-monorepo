@@ -1,5 +1,35 @@
 import { createClient } from "@libsql/client";
 import { randomUUID } from "crypto";
+import { pmPermissions, cataloguePermissions, seedPermissions } from "./seed.js";
+
+async function seedRoles(
+  db: ReturnType<typeof createClient>,
+  roles: { name: string; permissions: string[] }[]
+) {
+  for (const role of roles) {
+    const existing = await db.execute({ sql: "SELECT id FROM roles WHERE name = ?", args: [role.name] });
+    const roleId = existing.rows.length ? String((existing.rows[0] as unknown as Record<string, string>).id) : randomUUID();
+    if (!existing.rows.length) {
+      await db.execute({ sql: "INSERT INTO roles (id, name) VALUES (?, ?)", args: [roleId, role.name] });
+    }
+    for (const permName of role.permissions) {
+      const perm = await db.execute({ sql: "SELECT id FROM permissions WHERE name = ?", args: [permName] });
+      if (!perm.rows.length) continue;
+      const permId = String((perm.rows[0] as unknown as Record<string, string>).id);
+      await db.execute({
+        sql: "INSERT OR IGNORE INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
+        args: [roleId, permId],
+      });
+    }
+  }
+}
+
+async function assignRole(db: ReturnType<typeof createClient>, userId: string, roleName: string) {
+  const role = await db.execute({ sql: "SELECT id FROM roles WHERE name = ?", args: [roleName] });
+  if (!role.rows.length) return;
+  const roleId = String((role.rows[0] as unknown as Record<string, string>).id);
+  await db.execute({ sql: "INSERT OR IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)", args: [userId, roleId] });
+}
 
 async function main() {
   const url = process.env.TURSO_PM_DATABASE_URL ?? process.env.TURSO_DATABASE_URL;
@@ -21,6 +51,28 @@ async function main() {
       if (!cex.rows.length) await cdb.execute({ sql: "INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, 'demo')", args: [u.id, u.email, u.name] });
     }
   }
+
+  // Roles & permissions — required so requirePerm() (packages/auth/src/permissions.ts) actually grants access
+  await seedPermissions(db, pmPermissions);
+  const pmReadPerms = pmPermissions.filter((p) => p.endsWith(".read"));
+  await seedRoles(db, [
+    { name: "Project Manager", permissions: pmPermissions },
+    { name: "Viewer", permissions: pmReadPerms },
+  ]);
+  await assignRole(db, "demo-user", "Project Manager");
+  await assignRole(db, "manager-1", "Project Manager");
+
+  if (cdb !== db) {
+    await seedPermissions(cdb, cataloguePermissions);
+  }
+  const catalogueReadPerms = cataloguePermissions.filter((p) => p.endsWith(".read"));
+  await seedRoles(cdb, [
+    { name: "Procurement", permissions: cataloguePermissions },
+    { name: "Viewer", permissions: catalogueReadPerms },
+  ]);
+  await assignRole(cdb, "procurement-1", "Procurement");
+  console.log("[seed-demo] roles seeded: Project Manager, Viewer (PM); Procurement, Viewer (Catalogue)");
+
   // PM approvals
   const projs = await db.execute("SELECT id, project_code, name FROM projects LIMIT 3");
   for (const p of projs.rows as unknown as {id:string,project_code:string,name:string}[]) {
