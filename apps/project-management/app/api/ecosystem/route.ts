@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/turso";
 
 /** Cross-app API docs/PRD.md:1252 — service-to-service via shared secret header */
-function verifyServiceToken(req: NextRequest): boolean {
+export function verifyServiceToken(req: NextRequest, isProduction = process.env.NODE_ENV === "production"): boolean {
   const token = req.headers.get("x-service-token");
-  // MVP: check equals AUTH_SECRET or bypass if not set
-  if (!process.env.AUTH_SECRET) return true;
-  return token === process.env.AUTH_SECRET;
+  const secret = process.env.AUTH_SECRET;
+  if (!secret) return !isProduction; // dev convenience only — closed by default in production
+  return token === secret;
 }
 
 export async function GET(req: NextRequest) {
