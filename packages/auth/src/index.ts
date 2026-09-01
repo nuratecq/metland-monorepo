@@ -6,7 +6,13 @@ const ISS = "metland";
 const DEFAULT_EXPIRES = "7d";
 
 function getSecret(): Uint8Array {
-  const s = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "dev-secret-change-me-32chars!!";
+  const s = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
+  if (!s) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("AUTH_SECRET (or NEXTAUTH_SECRET) must be set in production");
+    }
+    return new TextEncoder().encode("dev-secret-change-me-32chars!!");
+  }
   return new TextEncoder().encode(s);
 }
 
