@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/turso";
 import { randomUUID } from "crypto";
+import { requirePerm, PERMS } from "@/lib/rbac";
 
 /** Import Excel MVP docs/PRD.md:979 — supports JSON rows + multipart Excel via exceljs */
 export async function POST(req: NextRequest) {
+  const guard = await requirePerm(req, PERMS.importCreate);
+  if (guard) return guard;
   const ct = req.headers.get("content-type") ?? "";
   if (ct.includes("multipart/form-data")) {
     // Excel upload branch — parse via exceljs if available

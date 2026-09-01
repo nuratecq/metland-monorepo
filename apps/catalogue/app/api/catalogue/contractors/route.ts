@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/turso";
 import { contractorSchema } from "@metland/validators";
 import { randomUUID } from "crypto";
+import { requirePerm, PERMS } from "@/lib/rbac";
 
 let migrated = false;
 async function ensureMigrated() {
@@ -41,6 +42,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   await ensureMigrated();
+  const guard = await requirePerm(req, PERMS.contractorManage);
+  if (guard) return guard;
   const body = await req.json();
   const parsed = contractorSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });

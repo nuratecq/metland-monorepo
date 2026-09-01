@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/turso";
 import { randomUUID } from "crypto";
+import { requirePerm, PERMS } from "@/lib/rbac";
 
 let migrated = false;
 async function ensureMigrated() {
@@ -35,6 +36,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   await ensureMigrated();
+  const guard = await requirePerm(req, PERMS.materialManage);
+  if (guard) return guard;
   const body = await req.json();
   if (!body.name) return NextResponse.json({ error: "name required" }, { status: 400 });
   const db = getDb();

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/turso";
 import { randomUUID } from "crypto";
+import { requirePerm, PERMS } from "@/lib/rbac";
 
 /** GET recommendations list, POST approval request docs/PRD.md:944 */
 export async function GET(_req: NextRequest) {
@@ -10,6 +11,8 @@ export async function GET(_req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const guard = await requirePerm(req, PERMS.approvalCreate);
+  if (guard) return guard;
   const body = await req.json(); // { recommendation_id, selected_contractor_id, reason, requester_id }
   if (!body.recommendation_id || !body.selected_contractor_id) return NextResponse.json({ error: "recommendation_id & selected_contractor_id required" }, { status: 400 });
   const db = getDb();

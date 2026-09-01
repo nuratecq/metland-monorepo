@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/turso";
+import { requirePerm, PERMS } from "@/lib/rbac";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -12,6 +13,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const guard = await requirePerm(req, PERMS.contractorManage);
+  if (guard) return guard;
   const { id } = await params;
   const body = await req.json();
   const allowed = ["company_name","description","location","contact_name","contact_email","contact_phone","status"];
@@ -25,7 +28,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   return NextResponse.json({ data: rs.rows[0] });
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const guard = await requirePerm(req, PERMS.contractorManage);
+  if (guard) return guard;
   const { id } = await params;
   const db = getDb();
   await db.execute({ sql: "DELETE FROM contractors WHERE id = ?", args: [id] });
