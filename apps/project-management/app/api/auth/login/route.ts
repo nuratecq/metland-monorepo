@@ -17,6 +17,13 @@ export async function POST(req: NextRequest) {
     const { randomUUID } = await import("crypto");
     userId = randomUUID();
     await db.execute({ sql: "INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, 'demo')", args: [userId, email, userName] });
+    try {
+      const role = await db.execute({ sql: "SELECT id FROM roles WHERE name = 'Viewer'", args: [] });
+      if (role.rows.length) {
+        const roleId = String((role.rows[0] as unknown as Record<string, string>).id);
+        await db.execute({ sql: "INSERT OR IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)", args: [userId, roleId] });
+      }
+    } catch {}
   }
   const token = await signSession({ userId, email, name: userName, roles: ["user"] });
   const res = NextResponse.json({ ok: true, user: { id: userId, email, name: userName }, token });
