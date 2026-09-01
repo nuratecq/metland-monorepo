@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifySession, SESSION_COOKIE } from "@metland/auth";
 
 const hits = new Map<string, { count: number; reset: number }>();
 function rateLimit(req: NextRequest): boolean {
@@ -9,8 +10,32 @@ function rateLimit(req: NextRequest): boolean {
   if (!entry || now > entry.reset) { hits.set(ip, { count: 1, reset: now + 60000 }); return true; }
   entry.count++; return entry.count <= 60;
 }
-export default function proxy(req: NextRequest) {
+
+const PUBLIC_PATHS = new Set(["/", "/login", "/forgot-password"]);
+
+export default async function proxy(req: NextRequest) {
   if (!rateLimit(req)) return new NextResponse("Too Many Requests", { status: 429 });
+
+  const { pathname } = req.nextUrl;
+  const token = req.cookies.get(SESSION_COOKIE)?.value;
+  const session = token ? await verifySession(token) : null;
+
+  if (pathname.startsWith("/api")) {
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  } else if (!session && !PUBLIC_PATHS.has(pathname)) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("next", pathname);
+    return NextResponse.redirect(url);
+  } else if (session && (pathname === "/login" || pathname === "/forgot-password")) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/dashboard";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   const res = NextResponse.next();
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("X-Content-Type-Options", "nosniff");
