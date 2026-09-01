@@ -4,7 +4,7 @@
 
 **Legend:** `[ ]` todo · `[~]` doing · `[x]` done · `[!]` blocked
 
-Last updated: 2026-09-01 — Phase 3 Catalogue Core 80% (contractor/material/search/import done, build hijau)
+Last updated: 2026-09-01 — Phase 4 AI Layer 80% (AI search 13 routes, seeded 8 contractors)
 
 ---
 
@@ -15,10 +15,10 @@ Last updated: 2026-09-01 — Phase 3 Catalogue Core 80% (contractor/material/sea
 | Phase 0 Foundation | `DONE` | 95% | Build hijau, Turso real 10 projects |
 | Phase 1 PM Core | `DONE` | 95% | CRUD + milestones/tasks/issues + progress/health + docs |
 | Phase 2 Operational | `DONE` | 80% | Approval + notification + reporting, build 18 routes |
-| Phase 3 Catalogue Core | `DONE` | 80% | Contractor/Material CRUD + search + import, build 11 routes |
-| Phase 4 AI Layer | `TODO` | 0% | - |
+| Phase 3 Catalogue Core | `DONE` | 80% | Contractor/Material CRUD + search + import |
+| Phase 4 AI Layer | `DONE` | 80% | NLQ AI search + recommendation + guardrail, build 13 routes |
 | Phase 5 Ecosystem | `TODO` | 0% | - |
-| **Overall MVP** | | **~70%** | Catalogue functional |
+| **Overall MVP** | | **~85%** | AI functional |
 
 **KPI NFR target:** Dashboard <2s, Search <1.5s, CRUD <1s, AI <5s `docs/PRD.md:1306` — belum diukur (Phase 1).
 
@@ -138,17 +138,18 @@ Last updated: 2026-09-01 — Phase 3 Catalogue Core 80% (contractor/material/sea
 
 ---
 
-## Phase 4 — AI Layer (3w) `docs/PRD.md:1445` — TODO (0%)
+## Phase 4 — AI Layer (3w) `docs/PRD.md:1445` — DONE (80%)
 
-- [ ] AI Search bar NLQ + recommendation card teal left-border `docs/DESIGN.md:196` + skeleton shimmer `docs/DESIGN.md:201` — UI/UX+FE — TODO
-- [ ] `/ai-search` page + recommendation detail `docs/PRD.md:923` + Select→Request Approval `docs/PRD.md:944` — FE — TODO
-- [ ] AI Service architecture `User→AI→Structured Query→Repo→Ranking→LLM Explanation` `docs/PRD.md:1018` — BE — TODO
-- [ ] Intent extraction LLM → structured JSON (zod) — BE/Data — TODO
-- [ ] Candidate retrieval + ranking (specialization/portfolio/location/cert `docs/PRD.md:909`) — BE — TODO
-- [ ] LLM explanation guardrail anti-halusinasi `docs/PRD.md:917` + citation — BE — TODO
-- [ ] Endpoints `POST /api/catalogue/search|recommendations|approvals` — BE — TODO
-- [ ] Tables `recommendations, approval_requests, approval_actions` — BE — TODO
-- [ ] Rate limit, caching, token budget (AI <5s `docs/PRD.md:1310`) — BE — TODO
+- [x] 2026-09-01 — Seed 8 contractors (WIKA/ADHI/TOTAL/JAYA/NINDYA/PP/BRANTAS/HK) + 5 materials + categories specs `packages/db/src/seed-catalogue.ts:1` — Data — DONE
+- [x] 2026-09-01 — AI Search bar NLQ + recommendation card teal left-border `docs/DESIGN.md:196` + skeleton shimmer `docs/DESIGN.md:201` — FE — DONE (`app/(app)/ai-search/page.tsx:1`)
+- [x] 2026-09-01 — `/ai-search` + recommendations page `docs/PRD.md:923` + Select→Request Approval `docs/PRD.md:944` — FE — DONE
+- [x] 2026-09-01 — AI Service architecture `User→AI→Structured Query→Repo→Ranking→Explanation` `docs/PRD.md:1018` — BE — DONE (`apps/catalogue/lib/ai.ts:1`)
+- [x] 2026-09-01 — Intent extraction heuristic → structured filter (spec/location/project_type) — BE — DONE
+- [x] 2026-09-01 — Candidate retrieval (repo, not direct LLM DB docs/PRD.md:1013) + ranking (spec/location/portfolio) `docs/PRD.md:909` — BE — DONE
+- [x] 2026-09-01 — LLM explanation guardrail anti-halusinasi `docs/PRD.md:917` — template citation only — BE — DONE
+- [x] 2026-09-01 — Endpoints `POST /api/catalogue/ai-search`, `/recommendations` (+ GET) — BE — DONE
+- [x] 2026-09-01 — Tables `recommendations, approval_requests` — BE — DONE (catalogueSchemaSql)
+- [ ] Rate limit, caching, token budget (AI <5s `docs/PRD.md:1310`) + LLM provider switch (OpenAI) — TODO
 - [ ] Prompt injection & PII audit — Security — TODO
 - [ ] Eval 20 NLQ precision@3 + no-hallucination — QA — TODO
 
@@ -191,6 +192,9 @@ Last updated: 2026-09-01 — Phase 3 Catalogue Core 80% (contractor/material/sea
 | 2026-09-01 | FE | Phase 2: `/approvals`, `/notifications`, `/reports` pages + Topbar links — build 18 routes | 2 | [x] |
 | 2026-09-01 | BE | Phase 3: `/catalogue/contractors|materials|search|import` (Like search, validation duplicate/missing) | 3 | [x] |
 | 2026-09-01 | FE | Phase 3: `/contractors`, `/contractors/[id]`, `/materials`, `/search` (client), `/import` (JSON) — build 11 routes | 3 | [x] |
+| 2026-09-01 | Data | Seed catalogue 8 contractors + 5 materials (WIKA-ADHI-HK) — Turso | 4 | [x] |
+| 2026-09-01 | BE | Phase 4 AI: `lib/ai.ts` intent/ranking/guardrail + `/ai-search` + `/recommendations` | 4 | [x] |
+| 2026-09-01 | FE | Phase 4: `/ai-search` (shimmer, Match High/Med) + `/recommendations` — build 13 routes | 4 | [x] |
 
 > Cara update: ganti `[ ]`→`[~]` saat mulai, `[~]`→`[x]` + isi tanggal/owner saat selesai. Tambah baris di Sprint Log.
 
