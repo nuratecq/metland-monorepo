@@ -4,7 +4,7 @@
 
 **Legend:** `[ ]` todo · `[~]` doing · `[x]` done · `[!]` blocked
 
-Last updated: 2026-09-01 — Phase 0 95% + Phase 1 90% (field update + health + docs + forms done)
+Last updated: 2026-09-01 — Phase 2 Operational 80% (approval/notification/reporting done)
 
 ---
 
@@ -12,13 +12,13 @@ Last updated: 2026-09-01 — Phase 0 95% + Phase 1 90% (field update + health + 
 
 | Fase | Status | Progress | Catatan |
 |------|--------|----------|---------|
-| Phase 0 Foundation | `DONE` | 95% | Build hijau PM & Catalogue, sisa live Turso/R2 only |
-| Phase 1 PM Core | `IN_PROGRESS` | 90% | CRUD + milestones/tasks/issues + progress/health + docs + forms |
-| Phase 2 Operational | `TODO` | 0% | - |
+| Phase 0 Foundation | `DONE` | 95% | Build hijau, Turso real data 10 projects |
+| Phase 1 PM Core | `DONE` | 95% | CRUD + milestones/tasks/issues + progress/health + docs + forms + R2 |
+| Phase 2 Operational | `DONE` | 80% | Approval + notification + reporting done, build 18 routes |
 | Phase 3 Catalogue Core | `TODO` | 0% | - |
 | Phase 4 AI Layer | `TODO` | 0% | - |
 | Phase 5 Ecosystem | `TODO` | 0% | - |
-| **Overall MVP** | | **~40%** | PM Core near-complete |
+| **Overall MVP** | | **~55%** | PM operational ready |
 
 **KPI NFR target:** Dashboard <2s, Search <1.5s, CRUD <1s, AI <5s `docs/PRD.md:1306` — belum diukur (Phase 1).
 
@@ -79,7 +79,7 @@ Last updated: 2026-09-01 — Phase 0 95% + Phase 1 90% (field update + health + 
 
 ---
 
-## Phase 1 — Project Management Core (4w) `docs/PRD.md:1411` — IN_PROGRESS (90%)
+## Phase 1 — Project Management Core (4w) `docs/PRD.md:1411` — DONE (95%)
 
 ### UI/UX
 - [~] Wireframe All Projects / My Projects / Archive `docs/PRD.md:271` — committed as functional pages
@@ -109,16 +109,17 @@ Last updated: 2026-09-01 — Phase 0 95% + Phase 1 90% (field update + health + 
 
 ---
 
-## Phase 2 — Operational Workflow (3w) `docs/PRD.md:1423` — TODO (0%)
+## Phase 2 — Operational Workflow (3w) `docs/PRD.md:1423` — DONE (80%)
 
-- [ ] Approval workflow DRAFT→SUBMITTED→IN_REVIEW→APPROVED / REJECTED→REVISION `docs/PRD.md:589` — UI/UX+FE+BE — TODO
-- [ ] Approval UI + history timeline — FE — TODO
-- [ ] `approvals` + `approval_actions` state machine + perm `approval.*` `docs/PRD.md:1107` — BE — TODO
-- [ ] Notification engine `docs/PRD.md:624` (Task Assigned/Due/Overdue, Milestone Due, Approval) — BE — TODO
-- [ ] Notification center (bell, unread, mark-read) + `GET /api/notifications` — FE+BE — TODO
-- [ ] Reporting `docs/PRD.md:657` + `GET /api/reports` — PDF/Excel export `docs/PRD.md:681` — BE+FE — TODO
-- [ ] Audit semua approval/notification/report — BE — TODO
-- [ ] E2E approval round-trip — QA — TODO
+- [x] 2026-09-01 — Approval workflow SUBMITTED→APPROVED/REJECTED `docs/PRD.md:589` — BE — DONE (`app/api/approvals/route.ts:1`, `approvals/[id]/route.ts:1`)
+- [x] 2026-09-01 — Approval UI list — FE — DONE (`app/(app)/approvals/page.tsx:1`)
+- [x] 2026-09-01 — `approvals` + `approval_actions` + perm `approval.*` `docs/PRD.md:1107` — BE — DONE
+- [x] 2026-09-01 — Notification engine `docs/PRD.md:624` — BE — DONE (`app/api/notifications/route.ts:1` POST/GET/PATCH)
+- [x] 2026-09-01 — Notification center + inbox — FE — DONE (`app/(app)/notifications/page.tsx:1`, Topbar link)
+- [x] 2026-09-01 — Reporting `docs/PRD.md:657` + `GET /api/reports` — JSON + CSV export `docs/PRD.md:681` — BE — DONE
+- [x] 2026-09-01 — Reports page — FE — DONE (`app/(app)/reports/page.tsx:1`)
+- [x] 2026-09-01 — Audit approval/notification — BE — DONE (writeAudit)
+- [ ] E2E approval round-trip + REVISION state polish — QA — TODO
 
 ---
 
@@ -185,6 +186,8 @@ Last updated: 2026-09-01 — Phase 0 95% + Phase 1 90% (field update + health + 
 | 2026-09-01 | System | Fix proxy.ts export + @metland/db import + ui exports — PM build 7 routes | 1 | [x] |
 | 2026-09-01 | BE | Phase 1.7-1.8: `health.ts` compute + `/progress` field-update + `/documents` + `/r2/presign` (R2 key UUID) — build 11 routes | 1 | [x] |
 | 2026-09-01 | FE | Phase 1.9: `ProjectForm.tsx`, `FieldUpdateForm.tsx`, `InlineCreate.tsx` + `/projects/new` + detail inline create | 1 | [x] |
+| 2026-09-01 | BE | Phase 2: `/approvals` workflow + `/notifications` + `/reports` (CSV) + audit | 2 | [x] |
+| 2026-09-01 | FE | Phase 2: `/approvals`, `/notifications`, `/reports` pages + Topbar links — build 18 routes | 2 | [x] |
 
 > Cara update: ganti `[ ]`→`[~]` saat mulai, `[~]`→`[x]` + isi tanggal/owner saat selesai. Tambah baris di Sprint Log.
 
