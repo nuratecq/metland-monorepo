@@ -27,9 +27,11 @@ export async function POST(req: NextRequest) {
   const db = getDb();
   const id = randomUUID();
   const now = new Date().toISOString();
+  // allow DRAFT or SUBMITTED init
+  const initStatus = body.status === "DRAFT" ? "DRAFT" : "SUBMITTED";
   await db.execute({
-    sql: `INSERT INTO approvals (id, entity_type, entity_id, requester_id, status, reason, created_at, updated_at) VALUES (?, ?, ?, ?, 'SUBMITTED', ?, ?, ?)`,
-    args: [id, body.entity_type, body.entity_id, body.requester_id ?? "system", body.reason ?? null, now, now],
+    sql: `INSERT INTO approvals (id, entity_type, entity_id, requester_id, status, reason, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [id, body.entity_type, body.entity_id, body.requester_id ?? "system", initStatus, body.reason ?? null, now, now],
   });
 
   // notify

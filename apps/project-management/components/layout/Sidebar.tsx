@@ -2,12 +2,15 @@ import Link from "next/link";
 
 const nav = [
   { href: "/", label: "Dashboard" },
-  { href: "/projects", label: "Projects" },
+  { href: "/projects", label: "All Projects" },
+  { href: "/projects/my", label: "My Projects" },
+  { href: "/projects/archive", label: "Project Archive" },
   { href: "/tasks", label: "Tasks" },
   { href: "/schedule", label: "Schedule" },
   { href: "/documents", label: "Documents" },
   { href: "/reports", label: "Reports" },
   { href: "/notifications", label: "Notifications" },
+  { href: "/approvals", label: "Approvals" },
 ];
 
 export function Sidebar() {

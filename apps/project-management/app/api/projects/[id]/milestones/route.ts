@@ -24,6 +24,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     args: [mId, project_id, d.name, d.description ?? null, d.start_date ?? null, d.due_date ?? null, d.completion_percentage, d.status, d.pic_user_id ?? null, now, now],
   });
+  // auto health sync docs/PRD.md:345
+  try { const { syncProjectHealth } = await import("@/lib/health"); await syncProjectHealth(project_id); } catch {}
   const rs = await db.execute({ sql: "SELECT * FROM milestones WHERE id = ?", args: [mId] });
   return NextResponse.json({ data: rs.rows[0] }, { status: 201 });
 }

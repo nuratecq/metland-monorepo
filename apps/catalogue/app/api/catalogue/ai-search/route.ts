@@ -40,12 +40,14 @@ export async function POST(req: NextRequest) {
   }));
 
   const ranked = rankCandidates(withPortfolios as never, intent).slice(0, 5);
-  const recommendations = ranked.map((r) => ({
+  // try LLM for top 1 if configured, fallback template guardrail
+  const llmTop = await (async()=>{ try{ const { tryLLMExplanation } = await import("@/lib/ai"); const prompt = `Query: ${query}\nTop candidate: ${ranked[0]?.candidate.company_name ?? ""} ${ranked[0]?.candidate.description ?? ""} — explain why recommended in 1 sentence from data only`; return await tryLLMExplanation(prompt); } catch { return null; } })();
+  const recommendations = ranked.map((r, idx) => ({
     contractor: r.candidate,
     score: r.score,
     match: r.score >= 50 ? "High" : r.score >= 30 ? "Medium" : "Low",
     reasons: r.reasons,
-    explanation: buildExplanation(r as never, intent),
+    explanation: idx===0 && llmTop ? llmTop : buildExplanation(r as never, intent),
   }));
 
   // persist recommendation record for approval flow docs/PRD.md:944

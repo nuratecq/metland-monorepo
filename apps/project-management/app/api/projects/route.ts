@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/turso";
 import { projectSchema } from "@metland/validators";
+import { requirePerm } from "@/lib/rbac";
 import { randomUUID } from "crypto";
 
 // auto-migrate on first request (dev fallback file DB)
@@ -21,6 +22,8 @@ function genCode() {
 }
 
 export async function GET(req: NextRequest) {
+  const guard = await requirePerm(req, "project.read");
+  if (guard) return guard;
   await ensureMigrated();
   const db = getDb();
   const { searchParams } = new URL(req.url);
@@ -55,6 +58,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const guard = await requirePerm(req, "project.create");
+  if (guard) return guard;
   await ensureMigrated();
   const body = await req.json();
   const parsed = projectSchema.safeParse(body);

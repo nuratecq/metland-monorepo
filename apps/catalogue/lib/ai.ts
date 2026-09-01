@@ -66,6 +66,21 @@ export function rankCandidates(candidates: Candidate[], intent: Intent): { candi
   }).sort((a, b) => b.score - a.score);
 }
 
+// Optional LLM provider docs/PRD.md:1015 — if OPENAI_API_KEY set, use LLM for explanation, else template guardrail
+export async function tryLLMExplanation(prompt: string): Promise<string | null> {
+  const key = process.env.OPENAI_API_KEY;
+  if (!key) return null;
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      body: JSON.stringify({ model: "gpt-4o-mini", messages: [{ role: "system", content: "Jawaban hanya dari data catalogue, jangan halusinasi docs/PRD.md:917" }, { role: "user", content: prompt }], max_tokens: 200 }),
+    });
+    const j = await res.json() as unknown as { choices?: { message?: { content?: string } }[] };
+    return j.choices?.[0]?.message?.content ?? null;
+  } catch { return null; }
+}
+
 // Guardrail explanation — only facts from candidate, no hallucination docs/PRD.md:917
 export function buildExplanation(ranked: { candidate: Candidate; score: number; reasons: string[] }, intent: Intent): string {
   const c = ranked.candidate;

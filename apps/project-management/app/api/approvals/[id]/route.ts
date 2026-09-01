@@ -25,9 +25,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     args: [randomUUID(), id, body.approver_id ?? "system", decision, body.comment ?? null, now],
   });
 
+  // full workflow docs/PRD.md:589: DRAFT->SUBMITTED->IN_REVIEW->APPROVED, REJECTED->REVISION->SUBMITTED
   let newStatus: string | null = null;
   if (decision === "APPROVED") newStatus = "APPROVED";
   else if (decision === "REJECTED") newStatus = "REJECTED";
+  else if (decision === "COMMENTED") {
+    const cur = String((ap.rows[0] as unknown as Record<string,string>).status);
+    if (cur === "SUBMITTED") newStatus = "IN_REVIEW";
+  }
+  // support explicit REVISION signal via comment "REVISION"
+  if (body.status === "REVISION" || String(body.comment ?? "").includes("REVISION")) newStatus = "REVISION";
+  if (body.status === "SUBMITTED" && String((ap.rows[0] as unknown as Record<string,string>).status) === "REVISION") newStatus = "SUBMITTED";
 
   if (newStatus) {
     await db.execute({ sql: "UPDATE approvals SET status = ?, updated_at = ? WHERE id = ?", args: [newStatus, now, id] });

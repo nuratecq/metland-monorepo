@@ -39,6 +39,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     args: [tId, project_id, d.title, d.description ?? null, d.assignee_id ?? null, d.priority, d.start_date ?? null, d.due_date ?? null, d.status, d.progress, now, now],
   });
+  try { const { syncProjectHealth } = await import("@/lib/health"); await syncProjectHealth(project_id); } catch {}
   const rs = await db.execute({ sql: "SELECT * FROM tasks WHERE id = ?", args: [tId] });
   return NextResponse.json({ data: rs.rows[0] }, { status: 201 });
 }
