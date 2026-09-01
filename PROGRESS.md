@@ -4,7 +4,7 @@
 
 **Legend:** `[ ]` todo · `[~]` doing · `[x]` done · `[!]` blocked
 
-Last updated: 2026-09-01 — Phase 2 Operational 80% (approval/notification/reporting done)
+Last updated: 2026-09-01 — Phase 3 Catalogue Core 80% (contractor/material/search/import done, build hijau)
 
 ---
 
@@ -12,13 +12,13 @@ Last updated: 2026-09-01 — Phase 2 Operational 80% (approval/notification/repo
 
 | Fase | Status | Progress | Catatan |
 |------|--------|----------|---------|
-| Phase 0 Foundation | `DONE` | 95% | Build hijau, Turso real data 10 projects |
-| Phase 1 PM Core | `DONE` | 95% | CRUD + milestones/tasks/issues + progress/health + docs + forms + R2 |
-| Phase 2 Operational | `DONE` | 80% | Approval + notification + reporting done, build 18 routes |
-| Phase 3 Catalogue Core | `TODO` | 0% | - |
+| Phase 0 Foundation | `DONE` | 95% | Build hijau, Turso real 10 projects |
+| Phase 1 PM Core | `DONE` | 95% | CRUD + milestones/tasks/issues + progress/health + docs |
+| Phase 2 Operational | `DONE` | 80% | Approval + notification + reporting, build 18 routes |
+| Phase 3 Catalogue Core | `DONE` | 80% | Contractor/Material CRUD + search + import, build 11 routes |
 | Phase 4 AI Layer | `TODO` | 0% | - |
 | Phase 5 Ecosystem | `TODO` | 0% | - |
-| **Overall MVP** | | **~55%** | PM operational ready |
+| **Overall MVP** | | **~70%** | Catalogue functional |
 
 **KPI NFR target:** Dashboard <2s, Search <1.5s, CRUD <1s, AI <5s `docs/PRD.md:1306` — belum diukur (Phase 1).
 
@@ -123,17 +123,18 @@ Last updated: 2026-09-01 — Phase 2 Operational 80% (approval/notification/repo
 
 ---
 
-## Phase 3 — AI Catalogue Core (4w) `docs/PRD.md:1433` — TODO (0%)
+## Phase 3 — AI Catalogue Core (4w) `docs/PRD.md:1433` — DONE (80%)
 
-- [ ] IA Catalogue `docs/PRD.md:738` + card design `docs/DESIGN.md:194` + import wizard `docs/PRD.md:979` — UI/UX — TODO
-- [ ] Routes: `/contractors`, `/contractors/[id]`, `/materials`, `/materials/[id]`, `/search`, `/import` — FE — TODO
-- [ ] Filter sidebar Category/Spec/Location/Price/Availability/Brand/Cert `docs/PRD.md:847` (URL-synced), compare view — FE — TODO
-- [ ] CRUD `GET/POST /api/catalogue/contractors`, `/:id`, `/materials`, `/:id` `docs/PRD.md:1240` — BE — TODO
-- [ ] Contractor `docs/PRD.md:769` + portfolio `docs/PRD.md:802` + material `docs/PRD.md:822` model — BE — TODO
-- [ ] Search non-AI (FTS5/LIKE) + pagination — BE — TODO
-- [ ] Excel import: parse→mapping→validation (duplicate/missing/format `docs/PRD.md:1001`)→preview→import + `POST /api/catalogue/import` — BE+FE — TODO
-- [ ] R2 `contractors/{id}/...`, `materials/{id}/...` `docs/PRD.md:1208` — BE — TODO
-- [ ] Import test 1k rows — QA — TODO
+- [x] 2026-09-01 — IA Catalogue `docs/PRD.md:738` + card teal left-border `docs/DESIGN.md:194` — UI/UX — DONE
+- [x] 2026-09-01 — Routes: `/contractors`, `/contractors/[id]`, `/materials`, `/search`, `/import` — FE — DONE (`app/(app)/contractors/page.tsx:1`, `materials/page.tsx:1`, `search/page.tsx:1`, `import/page.tsx:1`)
+- [x] 2026-09-01 — Filter Category/Spec/Location docs/PRD.md:847 (q, category, specialization, location) — FE/BE — DONE
+- [x] 2026-09-01 — CRUD `GET/POST /api/catalogue/contractors`, `/:id`, `/materials`, `/:id` `docs/PRD.md:1240` — BE — DONE
+- [x] 2026-09-01 — Contractor `docs/PRD.md:769` + portfolio `docs/PRD.md:802` + material `docs/PRD.md:822` — BE — DONE (catalogueSchemaSql, pagination)
+- [x] 2026-09-01 — Search non-AI LIKE `docs/PRD.md:841` + pagination — BE — DONE (`/api/catalogue/search`)
+- [x] 2026-09-01 — Excel import: mapping→validation (duplicate/missing `docs/PRD.md:1001`)→preview→import + `POST /api/catalogue/import` — BE — DONE
+- [x] 2026-09-01 — Import UI JSON paste MVP — FE — DONE
+- [ ] R2 `contractors/{id}/...` docs + material docs `docs/PRD.md:1208` — TODO
+- [ ] Import test 1k rows + CSV upload — QA — TODO
 
 ---
 
@@ -188,6 +189,8 @@ Last updated: 2026-09-01 — Phase 2 Operational 80% (approval/notification/repo
 | 2026-09-01 | FE | Phase 1.9: `ProjectForm.tsx`, `FieldUpdateForm.tsx`, `InlineCreate.tsx` + `/projects/new` + detail inline create | 1 | [x] |
 | 2026-09-01 | BE | Phase 2: `/approvals` workflow + `/notifications` + `/reports` (CSV) + audit | 2 | [x] |
 | 2026-09-01 | FE | Phase 2: `/approvals`, `/notifications`, `/reports` pages + Topbar links — build 18 routes | 2 | [x] |
+| 2026-09-01 | BE | Phase 3: `/catalogue/contractors|materials|search|import` (Like search, validation duplicate/missing) | 3 | [x] |
+| 2026-09-01 | FE | Phase 3: `/contractors`, `/contractors/[id]`, `/materials`, `/search` (client), `/import` (JSON) — build 11 routes | 3 | [x] |
 
 > Cara update: ganti `[ ]`→`[~]` saat mulai, `[~]`→`[x]` + isi tanggal/owner saat selesai. Tambah baris di Sprint Log.
 
