@@ -27,10 +27,15 @@ export async function POST(req: NextRequest) {
   const rs = await db.execute({ sql, args: args as never[] });
   let candidates = rs.rows as unknown as { id: string; company_name: string; company_code: string; description: string | null; location: string | null; spec_name: string | null; category_name: string | null }[];
 
-  // if filtered too narrow, fallback to LIKE on description
+  // if filtered too narrow, fallback to broader LIKE — avoid empty due to strict spec/location
   if (candidates.length === 0) {
-    const fb = await db.execute({ sql: "SELECT c.id, c.company_name, c.company_code, c.description, c.location, cs.name as spec_name, cc.name as category_name FROM contractors c LEFT JOIN contractor_specializations cs ON cs.id=c.specialization_id LEFT JOIN contractor_categories cc ON cc.id=c.category_id WHERE c.company_name LIKE ? OR c.description LIKE ? LIMIT 10", args: [`%${intent.keywords[0] ?? ""}%`, `%${intent.keywords[0] ?? ""}%`] });
-    candidates = fb.rows as never;
+    // try spec-only or location-only, else just top contractors by portfolio
+    const trySpec = intent.specialization ? await db.execute({ sql: "SELECT c.id, c.company_name, c.company_code, c.description, c.location, cs.name as spec_name, cc.name as category_name FROM contractors c LEFT JOIN contractor_specializations cs ON cs.id=c.specialization_id LEFT JOIN contractor_categories cc ON cc.id=c.category_id WHERE cs.name = ? LIMIT 10", args: [intent.specialization] }) : { rows: [] as unknown[] };
+    if ((trySpec.rows as unknown[]).length) candidates = trySpec.rows as never;
+    else {
+      const fb = await db.execute({ sql: "SELECT c.id, c.company_name, c.company_code, c.description, c.location, cs.name as spec_name, cc.name as category_name FROM contractors c LEFT JOIN contractor_specializations cs ON cs.id=c.specialization_id LEFT JOIN contractor_categories cc ON cc.id=c.category_id WHERE c.company_name LIKE ? OR c.description LIKE ? OR cs.name LIKE ? LIMIT 10", args: [`%${intent.keywords[2] ?? intent.keywords[0] ?? ""}%`, `%${intent.keywords[2] ?? intent.keywords[0] ?? ""}%`, `%${intent.keywords[2] ?? ""}%`] });
+      candidates = fb.rows.length ? (fb.rows as never) : (await db.execute({ sql: "SELECT c.id, c.company_name, c.company_code, c.description, c.location, cs.name as spec_name, cc.name as category_name FROM contractors c LEFT JOIN contractor_specializations cs ON cs.id=c.specialization_id LEFT JOIN contractor_categories cc ON cc.id=c.category_id LIMIT 10" })).rows as never;
+    }
   }
 
   // attach portfolios for ranking context

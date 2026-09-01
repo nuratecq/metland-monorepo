@@ -1,4 +1,5 @@
 import { AppSwitcher } from "./AppSwitcher";
+import { Bell } from "lucide-react";
 export function Topbar() {
   return (
     <header className="h-14 border-b border-[var(--color-outline-variant)] bg-white flex items-center justify-between px-4">
@@ -7,7 +8,7 @@ export function Topbar() {
         <AppSwitcher />
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-sm">🔔</span>
+        <Bell size={18} className="text-[var(--color-on-surface-variant)]" />
         <div className="h-8 w-8 rounded-full bg-[var(--color-primary)] text-white grid place-items-center text-sm">AI</div>
       </div>
     </header>
