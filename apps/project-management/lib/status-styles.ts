@@ -21,6 +21,14 @@ export const TASK_STATUS_STYLE: Record<string, { bg: string; color: string; labe
   CANCELLED: { bg: "#f1f5f9", color: "#64748b", label: "Cancelled" },
 };
 
+export const DOC_STATUS_STYLE: Record<string, { bg: string; color: string }> = {
+  DRAFT: { bg: "#f1f5f9", color: "#475569" },
+  UNDER_REVIEW: { bg: "#dbeafe", color: "#1e40af" },
+  APPROVED: { bg: "#dcfce7", color: "#166534" },
+  REJECTED: { bg: "#fee2e2", color: "#991b1b" },
+  ARCHIVED: { bg: "#f1f5f9", color: "#64748b" },
+};
+
 export const SEVERITY_STYLE: Record<string, { bg: string; color: string }> = {
   LOW: { bg: "#f1f5f9", color: "#475569" },
   MEDIUM: { bg: "#fef3c7", color: "#92400e" },

@@ -2,9 +2,11 @@ import { getDb } from "@/lib/turso";
 import { Table, Th, Td } from "@metland/ui";
 import { FieldUpdateForm } from "@/components/forms/FieldUpdateForm";
 import { InlineCreate } from "@/components/forms/InlineCreate";
+import { DocumentUpload } from "@/components/forms/DocumentUpload";
+import { DocumentStatus } from "@/components/forms/DocumentStatus";
 import { TaskFilters } from "@/components/projects/TaskFilters";
 import { buildProjectInsight } from "@/lib/insight";
-import { HEALTH_STYLE, PROJECT_STATUS_LABEL, TASK_STATUS_STYLE, SEVERITY_STYLE } from "@/lib/status-styles";
+import { HEALTH_STYLE, PROJECT_STATUS_LABEL, TASK_STATUS_STYLE, SEVERITY_STYLE, DOC_STATUS_STYLE } from "@/lib/status-styles";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -20,6 +22,7 @@ type Milestone = { id: string; name: string; completion_percentage: number; stat
 type Task = { id: string; title: string; status: string; due_date: string | null; assignee_name: string | null };
 type Issue = { id: string; title: string; severity: string; status: string };
 type AuditLog = { id: string; action: string; new_value: string | null; created_at: string };
+type Doc = { id: string; file_name: string; category: string | null; status: string; file_size: number; uploader_name: string | null };
 
 export default async function ProjectDetail({
   params,
@@ -57,6 +60,16 @@ export default async function ProjectDetail({
   const issues = await db
     .execute({ sql: "SELECT id, title, severity, status FROM issues WHERE project_id = ? ORDER BY created_at DESC LIMIT 10", args: [id] })
     .then((r) => r.rows as unknown as Issue[])
+    .catch(() => []);
+
+  const docs = await db
+    .execute({
+      sql: `SELECT d.id, d.file_name, d.category, d.status, d.file_size, u.name as uploader_name
+            FROM documents d LEFT JOIN users u ON u.id = d.uploaded_by
+            WHERE d.entity_type='project' AND d.entity_id=? ORDER BY d.uploaded_at DESC LIMIT 20`,
+      args: [id],
+    })
+    .then((r) => r.rows as unknown as Doc[])
     .catch(() => []);
 
   const logs = await db
@@ -217,9 +230,41 @@ export default async function ProjectDetail({
             </div>
           ) : null}
 
+          <div className="bg-white border border-[var(--color-outline-variant)] rounded">
+            <div className="px-4 py-3.5 border-b border-[var(--color-outline-variant)] font-semibold" style={{ fontFamily: "var(--font-hanken)" }}>
+              Dokumen — {docs.length}
+            </div>
+            <div className="p-4 flex flex-col gap-2">
+              {docs.length === 0 ? (
+                <div className="text-sm text-[var(--color-on-surface-variant)]">Belum ada dokumen</div>
+              ) : (
+                docs.map((d) => {
+                  const st = DOC_STATUS_STYLE[d.status] ?? DOC_STATUS_STYLE.DRAFT;
+                  return (
+                    <div key={d.id} className="flex items-center justify-between gap-3 border border-[var(--color-surface-container-high)] rounded px-3 py-2">
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium truncate">{d.file_name}</div>
+                        <div className="text-xs text-[var(--color-on-surface-variant)]">
+                          {d.category ?? "Other"} · {Math.max(1, Math.round(d.file_size / 1024))} KB · {d.uploader_name ?? "—"}
+                        </div>
+                      </div>
+                      <span className="flex items-center gap-2 flex-none">
+                        <DocumentStatus documentId={d.id} status={d.status} />
+                        <span className="h-[22px] px-2 inline-flex items-center rounded text-xs font-semibold tracking-wide uppercase" style={{ background: st.bg, color: st.color }}>
+                          {d.status}
+                        </span>
+                      </span>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
           <div id="update" className="grid md:grid-cols-2 gap-5">
             <FieldUpdateForm projectId={id} />
             <InlineCreate projectId={id} />
+            <DocumentUpload projectId={id} />
           </div>
         </div>
 

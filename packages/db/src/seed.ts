@@ -41,3 +41,7 @@ export async function seedPermissions(client: ReturnType<typeof createClient>, p
 }
 
 export { pmPermissions, cataloguePermissions };
+
+/** Read-only role grants. "ends with .read" alone would hand Viewer audit.read
+ * too — the audit trail is an admin surface (PRD §18), not general read data. */
+export const viewerPerms = (all: string[]) => all.filter((p) => p.endsWith(".read") && p !== "audit.read");

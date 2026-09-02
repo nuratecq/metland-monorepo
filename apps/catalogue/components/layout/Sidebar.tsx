@@ -3,27 +3,34 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Building2, Package, Search, Sparkles, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Building2, Package, Search, Sparkles, ListChecks, ShieldCheck, BarChart3 } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 
+// `perm` is cosmetic — proxy.ts is the real gate. It just stops us advertising
+// AI Search to a Viewer, who gets 403 on submit because the route writes a
+// recommendations row.
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/contractors", label: "Contractors", icon: Building2 },
   { href: "/materials", label: "Materials", icon: Package },
-  { href: "/search", label: "AI Search", icon: Search },
-  { href: "/recommendations", label: "Recommendations", icon: Sparkles },
+  { href: "/search", label: "Search", icon: Search },
+  { href: "/ai-search", label: "AI Search", icon: Sparkles, perm: "recommendation.create" },
+  { href: "/recommendations", label: "Recommendations", icon: ListChecks },
   { href: "/approvals", label: "Approvals", icon: ShieldCheck },
+  { href: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
-const admin = [
-  { href: "/admin/users", label: "Users" },
-  { href: "/import", label: "Import Data" },
-  { href: "/admin/audit", label: "Audit Logs" },
-];
+// Only routes that exist. User/role/audit admin lives in the PM app (same users
+// and audit_logs tables, and catalogue roles carry no user.manage/audit.read),
+// so those links belong there, not here.
+const admin = [{ href: "/import", label: "Import Data", perm: "import.create" }];
 
-export function Sidebar({ user }: { user?: { name: string; role: string } }) {
+export function Sidebar({ user, perms = [] }: { user?: { name: string; role: string }; perms?: string[] }) {
   const pathname = usePathname();
+  const has = (p?: string) => !p || perms.includes("*") || perms.includes(p);
+  const visibleNav = nav.filter((n) => has(n.perm));
   const isActive = (href: string) => (href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href));
+  const visibleAdmin = admin.filter((a) => has(a.perm));
   const initials = (user?.name ?? "AI")
     .split(" ")
     .map((s) => s[0])
@@ -38,7 +45,7 @@ export function Sidebar({ user }: { user?: { name: string; role: string } }) {
         <span className="text-sm text-[var(--color-on-surface-variant)]">Catalogue</span>
       </div>
       <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-        {nav.map((n) => {
+        {visibleNav.map((n) => {
           const active = isActive(n.href);
           return (
             <Link
@@ -55,9 +62,9 @@ export function Sidebar({ user }: { user?: { name: string; role: string } }) {
             </Link>
           );
         })}
-        <div className="pt-4 mt-4 border-t border-[var(--color-outline-variant)]">
+        <div className={`pt-4 mt-4 border-t border-[var(--color-outline-variant)] ${visibleAdmin.length ? "" : "hidden"}`}>
           <div className="px-3 text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">Administration</div>
-          {admin.map((a) => (
+          {visibleAdmin.map((a) => (
             <Link key={a.href} href={a.href} className="flex items-center gap-2.5 h-[38px] px-3 rounded text-sm text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container)]">
               <ShieldCheck size={16} />
               {a.label}

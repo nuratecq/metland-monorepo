@@ -8,6 +8,10 @@
     "./catalogue": "./src/catalogue.ts",
     "./client": "./src/client.ts"
   },
+  "scripts": {
+    "seed": "tsx src/seed.ts",
+    "seed:demo": "tsx src/seed-demo.ts"
+  },
   "dependencies": {
     "@libsql/client": "^0.15.0",
     "drizzle-orm": "^0.38.0",

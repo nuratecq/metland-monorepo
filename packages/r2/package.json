@@ -3,9 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": {
-    "@aws-sdk/client-s3": "^3.800.0"
+  "exports": {
+    ".": "./src/index.ts"
   },
-  "devDependencies": { "typescript": "^5.9.2" }
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.800.0",
+    "@aws-sdk/s3-request-presigner": "^3.1123.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
 }

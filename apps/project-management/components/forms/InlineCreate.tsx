@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 export function InlineCreate({ projectId }: { projectId: string }) {
   const r = useRouter();
-  const [tab, setTab] = useState<"milestone" | "task">("milestone");
+  const [tab, setTab] = useState<"milestone" | "task" | "issue">("milestone");
   const [msg, setMsg] = useState<string | null>(null);
 
   async function submitMilestone(e: React.FormEvent<HTMLFormElement>) {
@@ -24,14 +24,33 @@ export function InlineCreate({ projectId }: { projectId: string }) {
     if (!res.ok) setMsg(JSON.stringify(j.error ?? j)); else { setMsg("Task created"); r.refresh(); }
   }
 
+  async function submitIssue(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    // reported_by is omitted — the API takes the reporter from the session.
+    const body = { title: String(fd.get("title") ?? ""), description: String(fd.get("description") ?? "") || undefined, severity: String(fd.get("severity") ?? "MEDIUM"), due_date: String(fd.get("due_date") ?? "") || undefined };
+    const res = await fetch(`/api/projects/${projectId}/issues`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const j = await res.json();
+    if (!res.ok) setMsg(JSON.stringify(j.error ?? j)); else { setMsg("Issue created"); r.refresh(); }
+  }
+
   return (
     <div className="bg-white border border-[var(--color-outline-variant)] rounded p-4 space-y-3">
-      <div className="font-semibold" style={{ fontFamily: "var(--font-hanken)" }}>Tambah milestone / task</div>
+      <div className="font-semibold" style={{ fontFamily: "var(--font-hanken)" }}>Tambah milestone / task / issue</div>
       <div className="flex gap-2">
         <button onClick={() => setTab("milestone")} className={`px-3 py-1 rounded text-sm border ${tab === "milestone" ? "bg-[var(--color-primary)] text-white" : "bg-white"}`}>Milestone</button>
         <button onClick={() => setTab("task")} className={`px-3 py-1 rounded text-sm border ${tab === "task" ? "bg-[var(--color-primary)] text-white" : "bg-white"}`}>Task</button>
+        <button onClick={() => setTab("issue")} className={`px-3 py-1 rounded text-sm border ${tab === "issue" ? "bg-[var(--color-primary)] text-white" : "bg-white"}`}>Issue</button>
       </div>
-      {tab === "milestone" ? (
+      {tab === "issue" ? (
+        <form onSubmit={submitIssue} className="space-y-2">
+          <input name="title" required placeholder="Judul issue" className="w-full border rounded px-3 py-2 text-sm" />
+          <textarea name="description" rows={2} placeholder="Deskripsi (opsional)" className="w-full border rounded px-3 py-2 text-sm" />
+          <select name="severity" className="w-full border rounded px-3 py-2 text-sm"><option>LOW</option><option>MEDIUM</option><option>HIGH</option><option>CRITICAL</option></select>
+          <input name="due_date" type="date" className="w-full border rounded px-3 py-2 text-sm" />
+          <button className="bg-[var(--color-primary)] text-white px-3 py-1.5 rounded text-sm">Add Issue</button>
+        </form>
+      ) : tab === "milestone" ? (
         <form onSubmit={submitMilestone} className="space-y-2">
           <input name="name" required placeholder="Foundation" className="w-full border rounded px-3 py-2 text-sm" />
           <input name="due_date" type="date" className="w-full border rounded px-3 py-2 text-sm" />

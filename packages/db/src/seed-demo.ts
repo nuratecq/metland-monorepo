@@ -1,7 +1,7 @@
 import { createClient } from "@libsql/client";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
-import { pmPermissions, cataloguePermissions, seedPermissions } from "./seed.js";
+import { pmPermissions, cataloguePermissions, seedPermissions, viewerPerms } from "./seed.js";
 
 async function seedRoles(
   db: ReturnType<typeof createClient>,
@@ -22,6 +22,15 @@ async function seedRoles(
         args: [roleId, permId],
       });
     }
+    // Insert-only seeding can't take a permission back: narrowing a role in code
+    // would leave the old grant live on an already-seeded DB. Prune what the
+    // role no longer lists so this list is the source of truth.
+    const keep = role.permissions.map(() => "?").join(",");
+    await db.execute({
+      sql: `DELETE FROM role_permissions WHERE role_id = ? AND permission_id NOT IN
+            (SELECT id FROM permissions WHERE name IN (${keep || "NULL"}))`,
+      args: [roleId, ...role.permissions],
+    });
   }
 }
 
@@ -69,11 +78,16 @@ async function main() {
   }
 
   // Roles & permissions — required so requirePerm() (packages/auth/src/permissions.ts) actually grants access
-  await seedPermissions(db, pmPermissions);
-  const pmReadPerms = pmPermissions.filter((p) => p.endsWith(".read"));
+  // Shared DB: the catalogue permission rows must exist here too, or seedRoles
+  // silently skips every catalogue grant it cannot look up.
+  await seedPermissions(db, cdb === db ? [...pmPermissions, ...cataloguePermissions] : pmPermissions);
+  // Viewer is seeded once with both apps' read grants. Seeding it per-app would
+  // be wrong on a shared DB: seedRoles prunes what a role no longer lists, so the
+  // catalogue pass would revoke the PM grants the PM pass just made.
+  const viewerAll = [...new Set([...viewerPerms(pmPermissions), ...viewerPerms(cataloguePermissions)])];
   await seedRoles(db, [
     { name: "Project Manager", permissions: pmPermissions },
-    { name: "Viewer", permissions: pmReadPerms },
+    { name: "Viewer", permissions: viewerAll },
   ]);
   await assignRole(db, "demo-user", "Project Manager");
   await assignRole(db, "manager-1", "Project Manager");
@@ -81,12 +95,16 @@ async function main() {
   if (cdb !== db) {
     await seedPermissions(cdb, cataloguePermissions);
   }
-  const catalogueReadPerms = cataloguePermissions.filter((p) => p.endsWith(".read"));
   await seedRoles(cdb, [
     { name: "Procurement", permissions: cataloguePermissions },
-    { name: "Viewer", permissions: catalogueReadPerms },
+    ...(cdb === db ? [] : [{ name: "Viewer", permissions: viewerAll }]),
   ]);
   await assignRole(cdb, "procurement-1", "Procurement");
+  // One login works in both apps (docs/DEMO_ACCOUNTS.md), so demo-user needs a
+  // catalogue role too — a PM-only role means every catalogue route 403s.
+  await assignRole(cdb, "demo-user", "Viewer");
+  await assignRole(cdb, "manager-1", "Viewer");
+  await assignRole(db, "procurement-1", "Viewer");
   console.log("[seed-demo] roles seeded: Project Manager, Viewer (PM); Procurement, Viewer (Catalogue)");
 
   // PM approvals

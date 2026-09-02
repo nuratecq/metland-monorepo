@@ -2,8 +2,8 @@
 import Link from "next/link";
 export function AppSwitcher(){
   const apps=[
-    {name:"Project Management", href: process.env.NEXT_PUBLIC_PM_URL ?? "http://localhost:3000", current:false},
-    {name:"AI Catalogue", href: process.env.NEXT_PUBLIC_CATALOGUE_URL ?? "http://localhost:3001", current:true},
+    {name:"Project Management", href: process.env.NEXT_PUBLIC_PM_URL ?? "http://localhost:3001", current:false},
+    {name:"AI Catalogue", href: process.env.NEXT_PUBLIC_CATALOGUE_URL ?? "http://localhost:3000", current:true},
   ];
   return (
     <div className="flex gap-1 p-1 bg-[var(--color-surface-container)] rounded">

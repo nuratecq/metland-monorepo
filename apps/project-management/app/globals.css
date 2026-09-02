@@ -19,3 +19,11 @@ body {
 h1, h2, h3, h4 {
   font-family: var(--font-hanken), sans-serif;
 }
+
+/* Print = the PDF export path: drop chrome, keep the report. */
+@media print {
+  aside, header, nav { display: none !important; }
+  main { padding: 0 !important; }
+  body { background: #fff; }
+  * { box-shadow: none !important; }
+}

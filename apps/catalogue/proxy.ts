@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifySession, SESSION_COOKIE } from "@metland/auth";
+import { verifySession, SESSION_COOKIE, getPermissionsForUser, permissionFor, satisfies } from "@metland/auth";
+import { getDb } from "@/lib/turso";
+import { CATALOGUE_PERM_RULES } from "@/lib/perm-rules";
 
 const hits = new Map<string, { count: number; reset: number }>();
 function rateLimit(req: NextRequest): boolean {
@@ -23,6 +25,14 @@ export default async function proxy(req: NextRequest) {
   if (pathname.startsWith("/api")) {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    // Central RBAC — see apps/catalogue/lib/perm-rules.ts for the map.
+    const required = permissionFor(CATALOGUE_PERM_RULES, pathname, req.method);
+    if (required) {
+      const perms = await getPermissionsForUser(getDb() as never, session.userId);
+      if (!satisfies(perms, required)) {
+        return NextResponse.json({ error: `Forbidden: missing permission ${required}` }, { status: 403 });
+      }
     }
   } else if (!session && !PUBLIC_PATHS.has(pathname)) {
     const url = req.nextUrl.clone();

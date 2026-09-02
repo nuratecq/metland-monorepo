@@ -19,3 +19,20 @@ export async function getPermissionsForUser(db: DbLike, userId: string): Promise
   });
   return (rs.rows as { name: string }[]).map((r) => r.name);
 }
+
+/** Path -> required permission per HTTP method. First matching rule wins. */
+export type PermRule = { pattern: RegExp; methods: Record<string, string | string[]> };
+
+/** Returns the permission(s) required for this request, or null when unguarded.
+ * An array means "any of these is enough" (e.g. approve OR reject). */
+export function permissionFor(rules: PermRule[], pathname: string, method: string): string | string[] | null {
+  for (const r of rules) {
+    if (r.pattern.test(pathname)) return r.methods[method] ?? null;
+  }
+  return null;
+}
+
+export function satisfies(userPerms: string[], required: string | string[]): boolean {
+  if (userPerms.includes("*")) return true;
+  return Array.isArray(required) ? required.some((p) => userPerms.includes(p)) : userPerms.includes(required);
+}

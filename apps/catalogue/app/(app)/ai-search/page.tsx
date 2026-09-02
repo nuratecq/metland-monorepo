@@ -9,19 +9,41 @@ export default function AISearchPage() {
   const [loading, setLoading] = useState(false);
   const [recs, setRecs] = useState<Rec[]>([]);
   const [recId, setRecId] = useState<string | null>(null);
+  // Both calls need recommendation.create; a Viewer gets 403. That was swallowed
+  // before, so the page just sat there looking broken.
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   async function search() {
     setLoading(true);
-    const res = await fetch("/api/catalogue/ai-search", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ query: q }) });
-    const j = await res.json();
-    setRecs(j.recommendations ?? []);
-    setRecId(j.recommendation_id ?? null);
-    setLoading(false);
+    setError(null);
+    setNotice(null);
+    try {
+      const res = await fetch("/api/catalogue/ai-search", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ query: q }) });
+      const j = await res.json();
+      if (!res.ok) throw new Error(res.status === 403 ? "Peran Anda tidak punya izin recommendation.create — hubungi admin." : String(j.error ?? "Pencarian gagal"));
+      setRecs(j.recommendations ?? []);
+      setRecId(j.recommendation_id ?? null);
+      if (!(j.recommendations ?? []).length) setNotice("Tidak ada kontraktor yang cocok untuk query ini.");
+    } catch (e) {
+      setRecs([]);
+      setError(e instanceof Error ? e.message : "Pencarian gagal");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function requestApproval(cId:string) {
-    await fetch("/api/catalogue/recommendations", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ recommendation_id: recId, selected_contractor_id: cId, reason: q }) });
-    alert("Approval requested — human approval required docs/PRD.md:944");
+    setError(null);
+    setNotice(null);
+    try {
+      const res = await fetch("/api/catalogue/recommendations", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ recommendation_id: recId, selected_contractor_id: cId, reason: q }) });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(res.status === 403 ? "Peran Anda tidak punya izin untuk mengajukan approval." : String(j.error ?? "Gagal mengajukan approval"));
+      setNotice("Approval diajukan — butuh persetujuan manusia docs/PRD.md:944");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Gagal mengajukan approval");
+    }
   }
 
   return (
@@ -35,6 +57,9 @@ export default function AISearchPage() {
           <button onClick={search} disabled={loading} className="bg-[var(--color-primary)] text-white px-4 py-2 rounded text-sm">{loading? "Searching...":"AI Search"}</button>
         </CardContent>
       </Card>
+
+      {error ? <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">{error}</div> : null}
+      {notice ? <div className="rounded border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-900" role="status">{notice}</div> : null}
 
       {loading ? (
         <div className="space-y-3">

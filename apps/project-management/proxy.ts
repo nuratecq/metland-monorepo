@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifySession, SESSION_COOKIE } from "@metland/auth";
+import { verifySession, SESSION_COOKIE, getPermissionsForUser, permissionFor, satisfies } from "@metland/auth";
+import { getDb } from "@/lib/turso";
+import { PM_PERM_RULES } from "@/lib/perm-rules";
 
 // Security + rate-limit docs/PRD.md:1266
 const hits = new Map<string, { count: number; reset: number }>();
@@ -24,6 +26,16 @@ export default async function proxy(req: NextRequest) {
   if (pathname.startsWith("/api")) {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    // Central RBAC. Enforcing here instead of in each route handler keeps the
+    // permission map in one auditable place — a new route is guarded by adding
+    // a rule, not by remembering to call requirePerm().
+    const required = permissionFor(PM_PERM_RULES, pathname, req.method);
+    if (required) {
+      const perms = await getPermissionsForUser(getDb() as never, session.userId);
+      if (!satisfies(perms, required)) {
+        return NextResponse.json({ error: `Forbidden: missing permission ${required}` }, { status: 403 });
+      }
     }
   } else if (!session && !PUBLIC_PATHS.has(pathname)) {
     const url = req.nextUrl.clone();

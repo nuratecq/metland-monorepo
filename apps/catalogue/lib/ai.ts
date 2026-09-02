@@ -66,18 +66,47 @@ export function rankCandidates(candidates: Candidate[], intent: Intent): { candi
   }).sort((a, b) => b.score - a.score);
 }
 
-// Optional LLM provider docs/PRD.md:1015 — if OPENAI_API_KEY set, use LLM for explanation, else template guardrail
+// Optional LLM provider docs/PRD.md:1015 — any OpenAI-compatible endpoint (the
+// host is env-driven, it was hardcoded to api.openai.com). No key = deterministic
+// template explanations, which is a supported mode, not a failure.
+
+/** Epoch ms until which the provider is known-unavailable. The gateway returns
+ * 429 {code:"model_cooldown", reset_seconds:N} when its upstream credentials are
+ * cooling down; without this every ai-search would keep paying that round trip
+ * to learn the same thing. Module-level, so it resets on redeploy.
+ * ponytail: per-process, good enough for one instance — move to the DB or a
+ * shared cache if this ever runs multi-instance. */
+let cooldownUntil = 0;
+
 export async function tryLLMExplanation(prompt: string): Promise<string | null> {
-  const key = process.env.OPENAI_API_KEY;
+  const key = process.env.LLM_API_KEY ?? process.env.OPENAI_API_KEY;
   if (!key) return null;
+  if (Date.now() < cooldownUntil) return null;
+
+  const host = (process.env.LLM_HOST ?? "https://api.openai.com/v1").replace(/\/$/, "");
+  const model = process.env.LLM_MODEL ?? "gpt-4o-mini";
   try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    // Timeout because this sits in the ai-search request path — a slow provider
+    // must degrade to the template, never hang the page. Measured p50 ~2s with
+    // spikes past 8s on this gateway.
+    const res = await fetch(`${host}/chat/completions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
-      body: JSON.stringify({ model: "gpt-4o-mini", messages: [{ role: "system", content: "Jawaban hanya dari data catalogue, jangan halusinasi docs/PRD.md:917" }, { role: "user", content: prompt }], max_tokens: 200 }),
+      // stream:false is explicit — some gateways stream by default, and an SSE
+      // body would not parse as JSON here.
+      body: JSON.stringify({ model, stream: false, max_tokens: 200, messages: [{ role: "system", content: "Jawaban hanya dari data catalogue, jangan halusinasi docs/PRD.md:917" }, { role: "user", content: prompt }] }),
+      signal: AbortSignal.timeout(Number(process.env.LLM_TIMEOUT_MS ?? 15000)),
     });
+    if (!res.ok) {
+      if (res.status === 429) {
+        const secs = await res.json().then((b: unknown) => Number((b as { error?: { reset_seconds?: number } })?.error?.reset_seconds)).catch(() => NaN);
+        cooldownUntil = Date.now() + (Number.isFinite(secs) && secs > 0 ? secs : 60) * 1000;
+      }
+      return null;
+    }
     const j = await res.json() as unknown as { choices?: { message?: { content?: string } }[] };
-    return j.choices?.[0]?.message?.content ?? null;
+    const text = j.choices?.[0]?.message?.content?.trim();
+    return text ? text : null;
   } catch { return null; }
 }
 

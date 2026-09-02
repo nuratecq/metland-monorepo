@@ -19,10 +19,12 @@ const nav = [
   { href: "/approvals", label: "Approvals", icon: ShieldCheck },
 ];
 
+// Hiding a link is cosmetic — each page calls requirePagePerm() for the real
+// check. This just avoids showing links that would bounce back to /dashboard.
 const admin = [
-  { href: "/admin/users", label: "Users" },
-  { href: "/admin/roles", label: "Roles & Permissions" },
-  { href: "/admin/audit", label: "Audit Logs" },
+  { href: "/admin/users", label: "Users", perm: "user.manage" },
+  { href: "/admin/roles", label: "Roles", perm: "user.manage" },
+  { href: "/admin/audit", label: "Audit Trail", perm: "audit.read" },
 ];
 
 function reportPeriod() {
@@ -33,8 +35,9 @@ function reportPeriod() {
   return `${fmt(first)} – ${fmt(last)}`;
 }
 
-export function Sidebar({ user }: { user?: { name: string; role: string } }) {
+export function Sidebar({ user, perms = [] }: { user?: { name: string; role: string }; perms?: string[] }) {
   const pathname = usePathname();
+  const visibleAdmin = admin.filter((a) => perms.includes("*") || perms.includes(a.perm));
   const isActive = (href: string) => (href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href));
   const initials = (user?.name ?? "PM")
     .split(" ")
@@ -67,14 +70,25 @@ export function Sidebar({ user }: { user?: { name: string; role: string } }) {
             </Link>
           );
         })}
-        <div className="pt-4 mt-4 border-t border-[var(--color-outline-variant)]">
+        <div className={`pt-4 mt-4 border-t border-[var(--color-outline-variant)] ${visibleAdmin.length ? "" : "hidden"}`}>
           <div className="px-3 text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">Administration</div>
-          {admin.map((a) => (
-            <Link key={a.href} href={a.href} className="flex items-center gap-2.5 h-[38px] px-3 rounded text-sm text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container)]">
-              <ShieldCheck size={16} />
-              {a.label}
-            </Link>
-          ))}
+          {visibleAdmin.map((a) => {
+            const active = isActive(a.href);
+            return (
+              <Link
+                key={a.href}
+                href={a.href}
+                className={`flex items-center gap-2.5 h-[38px] px-3 rounded text-sm ${
+                  active
+                    ? "bg-[var(--color-secondary-container)] text-[var(--color-on-secondary-container)] font-semibold"
+                    : "text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container)]"
+                }`}
+              >
+                <ShieldCheck size={16} />
+                {a.label}
+              </Link>
+            );
+          })}
         </div>
       </nav>
       <div className="m-3 p-3.5 rounded-lg bg-[var(--color-surface-container-low)] border border-[var(--color-outline-variant)]">
