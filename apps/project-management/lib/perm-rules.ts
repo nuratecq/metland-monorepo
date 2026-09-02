@@ -12,6 +12,8 @@ export const PM_PERM_RULES: PermRule[] = [
   { pattern: /^\/api\/approvals$/, methods: { GET: "approval.create", POST: "approval.create" } },
 
   { pattern: /^\/api\/projects\/[^/]+\/tasks/, methods: { GET: "task.read", POST: "task.create" } },
+  // Kanban column moves — task.update, same as any other field edit.
+  { pattern: /^\/api\/tasks\/[^/]+$/, methods: { PATCH: "task.update" } },
   { pattern: /^\/api\/projects\/[^/]+\/milestones/, methods: { GET: "milestone.read", POST: "milestone.manage" } },
   { pattern: /^\/api\/projects\/[^/]+\/issues/, methods: { GET: "project.read", POST: "project.update" } },
   { pattern: /^\/api\/projects\/[^/]+\/documents/, methods: { GET: "document.read", POST: "document.upload" } },

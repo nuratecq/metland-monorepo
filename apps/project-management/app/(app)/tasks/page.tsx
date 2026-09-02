@@ -1,23 +1,47 @@
+import { getPermissionsForUser } from "@metland/auth";
+import { Kanban, type KanbanTask } from "@/components/tasks/Kanban";
+import { getSession } from "@/lib/auth";
 import { getDb } from "@/lib/turso";
-import { Card, CardContent, CardHeader, Badge } from "@metland/ui";
+
 export const dynamic = "force-dynamic";
 
 export default async function TasksPage() {
   const db = getDb();
-  let tasks: unknown[] = [];
+  const session = await getSession();
+
+  let tasks: KanbanTask[] = [];
+  let perms: string[] = [];
   try {
-    const rs = await db.execute("SELECT t.*, p.name as project_name FROM tasks t LEFT JOIN projects p ON p.id=t.project_id ORDER BY t.due_date ASC LIMIT 50");
-    tasks = rs.rows;
+    const [rs, p] = await Promise.all([
+      db.execute(`SELECT t.id, t.title, t.status, t.priority, t.due_date,
+                         u.name AS assignee_name, p.name AS project_name
+                  FROM tasks t
+                  LEFT JOIN projects p ON p.id = t.project_id
+                  LEFT JOIN users u ON u.id = t.assignee_id
+                  ORDER BY t.due_date IS NULL, t.due_date ASC
+                  LIMIT 200`),
+      session ? getPermissionsForUser(db as never, session.userId).catch(() => [] as string[]) : Promise.resolve([] as string[]),
+    ]);
+    tasks = rs.rows as unknown as KanbanTask[];
+    perms = p;
   } catch {}
+
+  const canEdit = perms.includes("*") || perms.includes("task.update");
+
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-hanken)" }}>Tasks — All</h1>
-      <Card><CardHeader className="font-semibold">Overdue / All Tasks</CardHeader><CardContent className="space-y-2">
-        {tasks.length === 0 ? <span className="text-sm text-[var(--color-on-surface-variant)]">No tasks — create via <code>POST /api/projects/:id/tasks</code></span> : tasks.map((r: unknown) => {
-          const t = r as Record<string, unknown>;
-          return <div key={String(t.id)} className="flex items-center justify-between border rounded p-2 text-sm"><span>{String(t.title)} <span className="text-xs text-[var(--color-on-surface-variant)]">({String(t.project_name)})</span></span><Badge status={t.status === "DONE" ? "success" : t.status === "BLOCKED" ? "critical" : "neutral"}>{String(t.status)}</Badge></div>;
-        })}
-      </CardContent></Card>
+      <div>
+        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-hanken)" }}>Tasks</h1>
+        <p className="text-sm text-[var(--color-on-surface-variant)]">Board semua proyek — {tasks.length} task</p>
+      </div>
+
+      {tasks.length === 0 ? (
+        <p className="text-sm text-[var(--color-on-surface-variant)]">
+          Belum ada task — buat lewat <code>POST /api/projects/:id/tasks</code>
+        </p>
+      ) : (
+        <Kanban tasks={tasks} canEdit={canEdit} />
+      )}
     </div>
   );
 }
