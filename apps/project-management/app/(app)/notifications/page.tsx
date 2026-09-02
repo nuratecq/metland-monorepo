@@ -9,7 +9,7 @@ export default async function NotificationsPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-hanken)" }}>Notifications</h1>
-      <p className="text-sm text-[var(--color-on-surface-variant)]">In-app MVP docs/PRD.md:641 — Task/Milestone/Approval events</p>
+      <p className="text-sm text-[var(--color-on-surface-variant)]">In-app MVP — Task/Milestone/Approval events</p>
       <Card><CardHeader className="font-semibold">Inbox</CardHeader><CardContent className="space-y-2">
         {notes.length===0 ? <span className="text-sm text-[var(--color-on-surface-variant)]">No notifications yet</span> : notes.map((r:unknown)=>{
           const n=r as Record<string,unknown>;

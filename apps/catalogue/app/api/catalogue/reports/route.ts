@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { csvResponse, xlsxResponse } from "@/lib/export";
 import { asDate, catalogueReport, catalogueSheets } from "@/lib/reports";
 
-/** Catalogue reporting docs/PRD.md:1536 — JSON/CSV/Excel with an optional reporting period. */
+/** Catalogue reporting — JSON/CSV/Excel with an optional reporting period. */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const format = searchParams.get("format") ?? "json";

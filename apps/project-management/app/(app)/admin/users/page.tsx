@@ -40,7 +40,7 @@ export default async function AdminUsersPage() {
         </Link>
       </div>
       <p className="text-sm text-[var(--color-on-surface-variant)]">
-        Role &amp; permission model docs/PRD.md:1084. Peran diberikan lewat seed — {users.length} pengguna terdaftar.
+        Role &amp; permission model. Peran diberikan lewat seed — {users.length} pengguna terdaftar.
       </p>
 
       <Table>

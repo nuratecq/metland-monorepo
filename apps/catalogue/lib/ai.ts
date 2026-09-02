@@ -1,4 +1,4 @@
-/** AI Service docs/PRD.md:1015 — structured query + ranking + guardrail */
+/** AI Service — structured query + ranking + guardrail */
 
 export type Intent = {
   specialization?: string; // Structure, MEP, Civil...
@@ -66,7 +66,7 @@ export function rankCandidates(candidates: Candidate[], intent: Intent): { candi
   }).sort((a, b) => b.score - a.score);
 }
 
-// Optional LLM provider docs/PRD.md:1015 — any OpenAI-compatible endpoint (the
+// Optional LLM provider — any OpenAI-compatible endpoint (the
 // host is env-driven, it was hardcoded to api.openai.com). No key = deterministic
 // template explanations, which is a supported mode, not a failure.
 
@@ -94,7 +94,7 @@ export async function tryLLMExplanation(prompt: string): Promise<string | null> 
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       // stream:false is explicit — some gateways stream by default, and an SSE
       // body would not parse as JSON here.
-      body: JSON.stringify({ model, stream: false, max_tokens: 200, messages: [{ role: "system", content: "Jawaban hanya dari data catalogue, jangan halusinasi docs/PRD.md:917" }, { role: "user", content: prompt }] }),
+      body: JSON.stringify({ model, stream: false, max_tokens: 200, messages: [{ role: "system", content: "Jawaban hanya dari data catalogue, jangan halusinasi" }, { role: "user", content: prompt }] }),
       signal: AbortSignal.timeout(Number(process.env.LLM_TIMEOUT_MS ?? 15000)),
     });
     if (!res.ok) {
@@ -110,7 +110,7 @@ export async function tryLLMExplanation(prompt: string): Promise<string | null> 
   } catch { return null; }
 }
 
-// Guardrail explanation — only facts from candidate, no hallucination docs/PRD.md:917
+// Guardrail explanation — only facts from candidate, no hallucination
 export function buildExplanation(ranked: { candidate: Candidate; score: number; reasons: string[] }, intent: Intent): string {
   const c = ranked.candidate;
   const match = ranked.score >= 50 ? "High" : ranked.score >= 30 ? "Medium" : "Low";

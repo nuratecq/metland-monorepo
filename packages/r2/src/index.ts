@@ -21,7 +21,7 @@ export function r2KeyFor(opts: {
   subdir?: string;
   filename: string;
 }): string {
-  // docs/PRD.md:1202 — use UUID randomized key, not filename as identifier
+  // — use UUID randomized key, not filename as identifier
   const ext = opts.filename.includes(".") ? "." + opts.filename.split(".").pop() : "";
   const uuid = randomUUID();
   const safe = sanitizeFilename(opts.filename);
@@ -35,7 +35,7 @@ export function sanitizeFilename(name: string): string {
   return name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120);
 }
 
-// Allowed MIME + size (docs/PRD.md:1280)
+// Allowed MIME + size
 export const ALLOWED_MIME = new Set([
   "image/jpeg","image/png","image/webp","application/pdf",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

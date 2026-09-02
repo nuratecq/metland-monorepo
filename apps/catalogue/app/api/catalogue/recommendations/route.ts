@@ -3,7 +3,7 @@ import { getDb } from "@/lib/turso";
 import { randomUUID } from "crypto";
 import { requirePerm, PERMS } from "@/lib/rbac";
 
-/** GET recommendations list, POST approval request docs/PRD.md:944 */
+/** GET recommendations list, POST approval request */
 export async function GET(_req: NextRequest) {
   const db = getDb();
   const rs = await db.execute("SELECT * FROM recommendations ORDER BY created_at DESC LIMIT 20");

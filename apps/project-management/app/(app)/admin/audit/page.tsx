@@ -54,7 +54,7 @@ export default async function AdminAuditPage({ searchParams }: { searchParams: P
         </Link>
       </div>
       <p className="text-sm text-[var(--color-on-surface-variant)]">
-        Semua perubahan tercatat docs/PRD.md:1053 — siapa, apa, kapan, nilai lama dan baru.
+        Semua perubahan tercatat — siapa, apa, kapan, nilai lama dan baru.
       </p>
 
       <div className="flex flex-wrap gap-2">

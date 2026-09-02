@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/turso";
 
-/** Cross-app API docs/PRD.md:1252 — service-to-service via shared secret header */
+/** Cross-app API — service-to-service via shared secret header */
 export function verifyServiceToken(req: NextRequest, isProduction = process.env.NODE_ENV === "production"): boolean {
   const token = req.headers.get("x-service-token");
   const secret = process.env.AUTH_SECRET;
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  // Webhook/event ingress docs/PRD.md:1252
+  // Webhook/event ingress
   if (!verifyServiceToken(req)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const body = await req.json();
   // log to audit

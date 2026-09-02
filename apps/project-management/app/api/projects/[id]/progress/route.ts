@@ -3,7 +3,7 @@ import { getDb } from "@/lib/turso";
 import { syncProjectHealth } from "@/lib/health";
 
 /**
- * Field Update — docs/PRD.md:478,480
+ * Field Update
  * Orang lapangan: update progress + note + attachment (R2 key).
  * For MVP: PATCH progress + optional note stored as audit, health auto-recalc.
  */

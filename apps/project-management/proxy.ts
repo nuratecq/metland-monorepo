@@ -4,7 +4,7 @@ import { verifySession, SESSION_COOKIE, getPermissionsForUser, permissionFor, sa
 import { getDb } from "@/lib/turso";
 import { PM_PERM_RULES } from "@/lib/perm-rules";
 
-// Security + rate-limit docs/PRD.md:1266
+// Security + rate-limit
 const hits = new Map<string, { count: number; reset: number }>();
 function rateLimit(req: NextRequest): boolean {
   const ip = req.headers.get("x-forwarded-for") ?? "local";

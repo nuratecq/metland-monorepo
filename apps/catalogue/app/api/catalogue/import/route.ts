@@ -3,7 +3,7 @@ import { getDb } from "@/lib/turso";
 import { randomUUID } from "crypto";
 import { requirePerm, PERMS } from "@/lib/rbac";
 
-/** Import Excel MVP docs/PRD.md:979 — supports JSON rows + multipart Excel via exceljs */
+/** Import Excel MVP — supports JSON rows + multipart Excel via exceljs */
 export async function POST(req: NextRequest) {
   const guard = await requirePerm(req, PERMS.importCreate);
   if (guard) return guard;

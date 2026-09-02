@@ -3,7 +3,7 @@ import { getDb } from "@/lib/turso";
 import { getSession } from "@/lib/auth";
 import { randomUUID } from "crypto";
 
-/** Documents — docs/PRD.md:546, R2 key docs/PRD.md:1202 */
+/** Documents + R2 key */
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const db = getDb();

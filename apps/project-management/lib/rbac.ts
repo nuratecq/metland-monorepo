@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifySession, SESSION_COOKIE, getPermissionsForUser } from "@metland/auth";
 import { getDb } from "@/lib/turso";
 
-// Permission matrix docs/PRD.md:1084
+// Permission matrix
 export const PERMS = {
   projectRead: "project.read",
   projectCreate: "project.create",

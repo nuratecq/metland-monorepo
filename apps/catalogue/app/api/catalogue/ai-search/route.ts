@@ -6,8 +6,8 @@ import { randomUUID } from "crypto";
 /**
  * POST /api/catalogue/ai-search
  * Body: { query: string }
- * Flow docs/PRD.md:868 — Intent → Search → Filtering → Candidate Retrieval → Ranking → Recommendation → Explanation
- * Guardrail docs/PRD.md:917 — no hallucination, all facts from catalogue
+ * Flow — Intent → Search → Filtering → Candidate Retrieval → Ranking → Recommendation → Explanation
+ * Guardrail — no hallucination, all facts from catalogue
  */
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   const intent = extractIntent(query);
   const db = getDb();
 
-  // Candidate retrieval via repository (not direct LLM DB access docs/PRD.md:1013)
+  // Candidate retrieval via repository (not direct LLM DB access)
   let sql = "SELECT c.id, c.company_name, c.company_code, c.description, c.location, cs.name as spec_name, cc.name as category_name FROM contractors c LEFT JOIN contractor_specializations cs ON cs.id=c.specialization_id LEFT JOIN contractor_categories cc ON cc.id=c.category_id WHERE 1=1";
   const args: unknown[] = [];
   // filtering by intent (structured query)
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     explanation: idx===0 && llmTop ? llmTop : buildExplanation(r as never, intent),
   }));
 
-  // persist recommendation record for approval flow docs/PRD.md:944
+  // persist recommendation record for approval flow
   const recId = randomUUID();
   try {
     await db.execute({

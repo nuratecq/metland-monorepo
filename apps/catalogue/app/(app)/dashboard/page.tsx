@@ -27,7 +27,7 @@ export default function Dashboard() {
           <Badge status="info">Phase 4</Badge>
         </CardHeader>
         <CardContent className="text-sm text-[var(--color-on-surface-variant)]">
-          Contoh: “Cari kontraktor struktur untuk proyek high rise” — pipeline Intent → Retrieval → Ranking → Explanation (guardrail anti-halusinasi docs/PRD.md:917).
+          Contoh: “Cari kontraktor struktur untuk proyek high rise” — pipeline Intent → Retrieval → Ranking → Explanation (guardrail anti-halusinasi).
         </CardContent>
       </Card>
     </div>

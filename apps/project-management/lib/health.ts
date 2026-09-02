@@ -2,7 +2,7 @@ import { getDb } from "@/lib/turso";
 
 export type Health = "GREEN" | "YELLOW" | "RED";
 
-// docs/PRD.md:345 — GREEN on track, YELLOW at risk, RED delayed
+// GREEN on track, YELLOW at risk, RED delayed
 export async function computeProjectHealth(projectId: string): Promise<{ health: Health; progress: number }> {
   const db = getDb();
   // progress = avg milestone completion or task progress

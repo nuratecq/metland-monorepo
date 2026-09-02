@@ -3,7 +3,7 @@ import { getDb } from "@/lib/turso";
 import { getSession } from "@/lib/auth";
 import { getUserPermissions } from "@/lib/rbac";
 
-/** Document lifecycle docs/PRD.md:546 — DRAFT→UNDER_REVIEW→APPROVED|REJECTED, any→ARCHIVED. */
+/** Document lifecycle — DRAFT→UNDER_REVIEW→APPROVED|REJECTED, any→ARCHIVED. */
 const NEXT: Record<string, string[]> = {
   DRAFT: ["UNDER_REVIEW", "ARCHIVED"],
   UNDER_REVIEW: ["APPROVED", "REJECTED", "ARCHIVED"],

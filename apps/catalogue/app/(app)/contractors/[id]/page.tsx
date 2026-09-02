@@ -19,7 +19,7 @@ export default async function ContractorDetail({ params }: { params: Promise<{ i
       </div>
       <div className="grid lg:grid-cols-2 gap-4">
         <Card><CardHeader className="font-semibold">Profile</CardHeader><CardContent className="text-sm space-y-1"><div>Contact: {String(c.contact_name ?? "-")} {String(c.contact_email ?? "")}</div><div>Certification: {String(c.certification ?? "-")}</div><div>Status: {String(c.status)}</div></CardContent></Card>
-        <Card><CardHeader className="font-semibold">Portfolio — {portfolios.rows.length}</CardHeader><CardContent className="space-y-2 text-sm">{portfolios.rows.length===0? <span className="text-[var(--color-on-surface-variant)]">No portfolio — used as AI context docs/PRD.md:802</span> : portfolios.rows.map((p:unknown)=>{const pp=p as Record<string,unknown>; return <div key={String(pp.id)} className="border rounded p-2"><div className="font-medium">{String(pp.project_name)}</div><div className="text-xs">{String(pp.client ?? "")} • {String(pp.location ?? "")} • {String(pp.year ?? "")}</div></div>;})}</CardContent></Card>
+        <Card><CardHeader className="font-semibold">Portfolio — {portfolios.rows.length}</CardHeader><CardContent className="space-y-2 text-sm">{portfolios.rows.length===0? <span className="text-[var(--color-on-surface-variant)]">No portfolio — used as AI context</span> : portfolios.rows.map((p:unknown)=>{const pp=p as Record<string,unknown>; return <div key={String(pp.id)} className="border rounded p-2"><div className="font-medium">{String(pp.project_name)}</div><div className="text-xs">{String(pp.client ?? "")} • {String(pp.location ?? "")} • {String(pp.year ?? "")}</div></div>;})}</CardContent></Card>
       </div>
     </div>
   );

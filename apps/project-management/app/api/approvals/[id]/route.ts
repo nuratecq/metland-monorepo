@@ -32,7 +32,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     args: [randomUUID(), id, approverId, decision, body.comment ?? null, now],
   });
 
-  // full workflow docs/PRD.md:589: DRAFT->SUBMITTED->IN_REVIEW->APPROVED, REJECTED->REVISION->SUBMITTED
+  // full workflow: DRAFT->SUBMITTED->IN_REVIEW->APPROVED, REJECTED->REVISION->SUBMITTED
   let newStatus: string | null = null;
   if (decision === "APPROVED") newStatus = "APPROVED";
   else if (decision === "REJECTED") newStatus = "REJECTED";

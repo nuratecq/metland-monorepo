@@ -18,7 +18,7 @@ export default function SearchPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold" style={{ fontFamily:"var(--font-hanken)" }}>Catalogue Search</h1>
-      <p className="text-sm text-[var(--color-on-surface-variant)]">Search powerful tanpa AI docs/PRD.md:841 — filter Category/Spec/Location/Price</p>
+      <p className="text-sm text-[var(--color-on-surface-variant)]">Search powerful tanpa AI — filter Category/Spec/Location/Price</p>
       <div className="flex gap-2">
         <select value={type} onChange={e=>setType(e.target.value as never)} className="border rounded px-3 py-2 text-sm"><option value="contractor">Contractor</option><option value="material">Material</option></select>
         <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Cari kontraktor struktur..." className="flex-1 border rounded px-3 py-2 text-sm" />

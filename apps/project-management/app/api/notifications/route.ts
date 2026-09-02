@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/turso";
 import { randomUUID } from "crypto";
 
-/** In-app notification MVP docs/PRD.md:641 */
+/** In-app notification MVP */
 export async function GET(req: NextRequest) {
   const db = getDb();
   const { searchParams } = new URL(req.url);

@@ -1,13 +1,13 @@
-// Ecosystem shared standards — docs/PRD.md:1453/1463, design tokens shared
+// Ecosystem shared standards , design tokens shared
 
 export const ecosystem = {
-  // Shared identity: same AUTH_SECRET valid cross-app docs/PRD.md:1045
+  // Shared identity: same AUTH_SECRET valid cross-app
   sso: {
     sharedSecret: "AUTH_SECRET", // both apps read same env
     cookieName: "metland_session",
     docs: "Same HS256 JWT verified by @metland/auth verifySession in both apps — local RBAC per app",
   },
-  // Cross-app API docs/PRD.md:1252
+  // Cross-app API
   apiPrefix: "/api/ecosystem",
   masterDataKeys: ["locations", "project_types", "contractor_categories"] as const,
 } as const;

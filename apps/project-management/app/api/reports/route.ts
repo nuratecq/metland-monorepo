@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { csvResponse, xlsxResponse } from "@/lib/export";
 import { asDate, dashboardReport, dashboardSheets, projectSheets, projectSummary } from "@/lib/reports";
 
-/** Reports docs/PRD.md:653 — Project Summary + Dashboard Report, period filter, JSON/CSV/Excel. */
+/** Reports — Project Summary + Dashboard Report, period filter, JSON/CSV/Excel. */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const format = searchParams.get("format") ?? "json";

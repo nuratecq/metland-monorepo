@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/turso";
 import { randomUUID } from "crypto";
 
-/** Approval workflow docs/PRD.md:589
+/** Approval workflow
  * DRAFT -> SUBMITTED -> IN_REVIEW -> APPROVED
  *                    \-> REJECTED -> REVISION -> SUBMITTED
  */

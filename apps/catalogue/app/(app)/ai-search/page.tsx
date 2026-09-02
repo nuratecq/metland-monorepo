@@ -40,7 +40,7 @@ export default function AISearchPage() {
       const res = await fetch("/api/catalogue/recommendations", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ recommendation_id: recId, selected_contractor_id: cId, reason: q }) });
       const j = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(res.status === 403 ? "Peran Anda tidak punya izin untuk mengajukan approval." : String(j.error ?? "Gagal mengajukan approval"));
-      setNotice("Approval diajukan — butuh persetujuan manusia docs/PRD.md:944");
+      setNotice("Approval diajukan — butuh persetujuan manusia");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Gagal mengajukan approval");
     }
@@ -49,7 +49,7 @@ export default function AISearchPage() {
   return (
     <div className="space-y-4 max-w-4xl">
       <h1 className="text-2xl font-bold" style={{ fontFamily:"var(--font-hanken)" }}>AI Search</h1>
-      <p className="text-sm text-[var(--color-on-surface-variant)]">Natural Language Query docs/PRD.md:868 — Intent → Retrieval → Ranking → Explanation (guardrail anti-halusinasi docs/PRD.md:917)</p>
+      <p className="text-sm text-[var(--color-on-surface-variant)]">Natural Language Query — Intent → Retrieval → Ranking → Explanation (guardrail anti-halusinasi)</p>
 
       <Card className="border-l-4 border-l-[var(--color-primary)]">
         <CardContent className="p-4 flex gap-2">
@@ -87,7 +87,7 @@ export default function AISearchPage() {
           ))}
         </div>
       ) : (
-        <div className="text-sm text-[var(--color-on-surface-variant)]">Try sample query and click AI Search — pipeline Ranking docs/PRD.md:868 will return top 5.</div>
+        <div className="text-sm text-[var(--color-on-surface-variant)]">Try sample query and click AI Search — pipeline Ranking will return top 5.</div>
       )}
     </div>
   );

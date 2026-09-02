@@ -1,7 +1,7 @@
 import { getDb } from "@/lib/turso";
 import type { Sheet } from "@/lib/export";
 
-/** Catalogue reporting docs/PRD.md:1536 — coverage, recommendation usage, approval turnaround. */
+/** Catalogue reporting — coverage, recommendation usage, approval turnaround. */
 
 export type Row = Record<string, string | number | null>;
 export type Period = { from: string | null; to: string | null };

@@ -26,7 +26,7 @@ export default function ImportPage() {
   return (
     <div className="space-y-4 max-w-3xl">
       <h1 className="text-2xl font-bold" style={{ fontFamily:"var(--font-hanken)" }}>Import Data</h1>
-      <p className="text-sm text-[var(--color-on-surface-variant)]">MVP flow docs/PRD.md:979 — Upload Excel→Column Mapping→Validation→Preview→Import (JSON paste MVP)</p>
+      <p className="text-sm text-[var(--color-on-surface-variant)]">MVP flow — Upload Excel→Column Mapping→Validation→Preview→Import (JSON paste MVP)</p>
       <Card><CardHeader className="font-semibold">Paste JSON rows (company_name, company_code, location)</CardHeader><CardContent className="space-y-2">
         <textarea value={json} onChange={e=>setJson(e.target.value)} rows={6} className="w-full border rounded p-2 font-mono text-xs" />
         <div className="flex gap-2">

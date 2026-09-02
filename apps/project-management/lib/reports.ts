@@ -1,7 +1,7 @@
 import { getDb } from "@/lib/turso";
 import type { Sheet } from "@/lib/export";
 
-/** Report queries docs/PRD.md:653 — shared by the page (direct call) and the export route. */
+/** Report queries — shared by the page (direct call) and the export route. */
 
 export type Row = Record<string, string | number | null>;
 export type Period = { from: string | null; to: string | null };

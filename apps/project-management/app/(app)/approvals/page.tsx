@@ -20,7 +20,7 @@ export default async function ApprovalsPage() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-hanken)" }}>Approvals</h1>
-      <p className="text-sm text-[var(--color-on-surface-variant)]">Workflow docs/PRD.md:589 — DRAFT→SUBMITTED→IN_REVIEW→APPROVED / REJECTED→REVISION</p>
+      <p className="text-sm text-[var(--color-on-surface-variant)]">Workflow — DRAFT→SUBMITTED→IN_REVIEW→APPROVED / REJECTED→REVISION</p>
       <Card>
         <CardHeader className="font-semibold">Approval Requests</CardHeader>
         <CardContent className="space-y-2">

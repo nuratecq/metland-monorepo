@@ -32,7 +32,7 @@ export default async function LandingPage() {
             <span className="text-sm text-[var(--color-on-surface-variant)]">Catalogue</span>
           </div>
           <Link href={session ? "/dashboard" : "/login"}>
-            <Button size="sm">{session ? "Buka Dashboard" : "Masuk"}</Button>
+            <Button size="sm" className="text-white">{session ? "Buka Dashboard" : "Masuk"}</Button>
           </Link>
         </div>
       </header>
@@ -52,7 +52,7 @@ export default async function LandingPage() {
             Satu katalog untuk mencari, membandingkan, dan mengajukan persetujuan procurement di seluruh
             proyek Metland.
           </p>
-          <div className="mt-9 flex flex-wrap items-center gap-3">
+          <div className="mt-9 flex flex-wrap items-center gap-3 text-white">
             <Link href={session ? "/dashboard" : "/login"}>
               <Button size="lg">{session ? "Buka Dashboard" : "Mulai sekarang"}</Button>
             </Link>

@@ -1,5 +1,5 @@
 /**
- * Catalogue Schema — docs/PRD.md:1168
+ * Catalogue Schema
  */
 
 export const catalogueSchemaSql = `

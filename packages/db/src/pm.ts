@@ -1,5 +1,5 @@
 /**
- * PM Schema — docs/PRD.md:1140
+ * PM Schema
  * users, roles, permissions, role_permissions, projects, project_members,
  * milestones, tasks, issues, documents, document_versions, approvals, approval_actions,
  * notifications, audit_logs, master_project_types, master_locations
