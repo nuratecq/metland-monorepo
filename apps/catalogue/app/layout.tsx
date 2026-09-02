@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${hanken.variable} ${inter.variable} ${jetbrains.variable} h-full antialiased`}>
+    <html lang="en" suppressHydrationWarning className={`${hanken.variable} ${inter.variable} ${jetbrains.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-[var(--color-background)] text-[var(--color-on-surface)]">
         {children}
       </body>

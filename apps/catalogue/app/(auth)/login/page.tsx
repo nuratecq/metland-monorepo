@@ -68,7 +68,7 @@ function LoginForm() {
         <input
           type="password"
           required
-          minLength={6}
+          minLength={8}
           value={pass}
           onChange={(e) => setPass(e.target.value)}
           placeholder="••••••••"
@@ -93,9 +93,6 @@ function LoginForm() {
           {loading ? "Memproses…" : "Masuk"}
         </button>
 
-        <div className="mt-5 px-3.5 py-3 rounded bg-[var(--color-surface-container-low)] border border-[var(--color-surface-container-highest)] text-[13px] leading-5 text-[var(--color-on-surface-variant)]">
-          Demo: isi email &amp; password apa saja, atau langsung tekan <strong>Masuk</strong>.
-        </div>
         <div className="mt-6 text-center text-sm text-[var(--color-on-surface-variant)]">
           Belum punya akses? <Link href="/" className="text-[var(--color-primary)] font-medium">Hubungi admin IT</Link>
         </div>

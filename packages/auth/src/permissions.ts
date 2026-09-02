@@ -1,5 +1,10 @@
+/** Structural subset of a libsql client. `args` is narrowed to the value types
+ * libsql actually binds, so callers can pass a real client without a cast. */
 export type DbLike = {
-  execute: (query: { sql: string; args: unknown[] }) => Promise<{ rows: unknown[] }>;
+  execute: (query: {
+    sql: string;
+    args: (string | number | bigint | ArrayBuffer | boolean | Date | null)[];
+  }) => Promise<{ rows: unknown[] }>;
 };
 
 /** Joins user_roles -> role_permissions -> permissions. Works against either app's schema (identical shape in pm.ts and catalogue.ts). */

@@ -46,5 +46,8 @@ export default async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/auth).*)"],
+  // Static assets must be excluded by extension too: without this, a request for
+  // /logo.png is treated as a page, fails the session check, and is redirected to
+  // /login — so the browser receives HTML where it expected an image.
+  matcher: ["/((?!_next/static|_next/image|api/auth|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico|woff2?|ttf|otf|txt|xml|webmanifest)$).*)"],
 };

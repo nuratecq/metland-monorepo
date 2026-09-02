@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, FolderKanban, FolderHeart, Archive, CheckSquare, CalendarDays, Files, BarChart3, Bell, ShieldCheck } from "lucide-react";
@@ -44,8 +45,9 @@ export function Sidebar({ user }: { user?: { name: string; role: string } }) {
 
   return (
     <aside className="w-[244px] shrink-0 border-r border-[var(--color-outline-variant)] bg-white hidden md:flex flex-col">
-      <div className="h-16 flex items-center px-5 border-b border-[var(--color-outline-variant)] font-bold tracking-tight" style={{ fontFamily: "var(--font-hanken)" }}>
-        METLAND PM
+      <div className="h-16 flex items-center gap-2 px-5 border-b border-[var(--color-outline-variant)] font-bold tracking-tight" style={{ fontFamily: "var(--font-hanken)" }}>
+        <Image src="/logo.png" alt="Metland" width={104} height={18} priority className="h-[18px] w-auto" />
+        <span className="text-sm text-[var(--color-on-surface-variant)]">PM</span>
       </div>
       <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
         {nav.map((n) => {

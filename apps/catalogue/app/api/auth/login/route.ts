@@ -1,31 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { signSession, SESSION_COOKIE, sessionCookieOptions } from "@metland/auth";
+import { authenticate, signSession, SESSION_COOKIE, sessionCookieOptions } from "@metland/auth";
 import { getDb } from "@/lib/turso";
 
+/**
+ * POST /api/auth/login — verifies the password against users.password_hash.
+ * Accounts are never auto-created here; an admin or the seed script must
+ * provision them, so an unknown email cannot mint itself a session.
+ */
 export async function POST(req: NextRequest) {
-  const { email, name } = await req.json();
-  if (!email) return NextResponse.json({ error: "email required" }, { status: 400 });
-  const db = getDb();
-  const existing = await db.execute({ sql: "SELECT * FROM users WHERE email = ?", args: [email] }).catch(()=>({rows:[]} as never));
-  let userId: string;
-  let userName = name ?? email.split("@")[0];
-  if (existing.rows.length) {
-    const u = existing.rows[0] as unknown as Record<string,string>;
-    userId = u.id; userName = u.name;
-  } else {
-    const { randomUUID } = await import("crypto");
-    userId = randomUUID();
-    await db.execute({ sql: "INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, 'demo')", args: [userId, email, userName] });
-    try {
-      const role = await db.execute({ sql: "SELECT id FROM roles WHERE name = 'Viewer'", args: [] });
-      if (role.rows.length) {
-        const roleId = String((role.rows[0] as unknown as Record<string, string>).id);
-        await db.execute({ sql: "INSERT OR IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)", args: [userId, roleId] });
-      }
-    } catch {}
+  const body = await req.json().catch(() => ({}));
+  const result = await authenticate(getDb(), body.email, body.password);
+
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: result.status });
   }
-  const token = await signSession({ userId, email, name: userName, roles: ["viewer"] });
-  const res = NextResponse.json({ ok: true, user: { id: userId, email, name: userName }, token });
+
+  const token = await signSession({
+    userId: result.userId,
+    email: result.email,
+    name: result.name,
+    roles: ["viewer"],
+  });
+  // Token travels in the httpOnly cookie only — never in the JSON body, where
+  // any script on the page could read it.
+  const res = NextResponse.json({ ok: true, user: { id: result.userId, email: result.email, name: result.name } });
   res.cookies.set(SESSION_COOKIE, token, sessionCookieOptions() as never);
   return res;
 }

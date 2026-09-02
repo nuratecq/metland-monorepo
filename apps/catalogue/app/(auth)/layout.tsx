@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const AUTH_POINTS = [
   "Cari kontraktor & material dengan bahasa natural",
   "Skor kecocokan otomatis, bukan tebak-tebakan",
@@ -9,9 +11,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen grid md:grid-cols-[0.92fr_1.08fr] bg-white">
       <div className="hidden md:flex flex-col justify-between p-12 bg-[var(--color-primary)]">
         <div className="self-start bg-white rounded px-4 py-3">
-          <span className="font-bold tracking-tight text-[var(--color-primary)]" style={{ fontFamily: "var(--font-hanken)" }}>
-            METLAND
-          </span>
+          <Image src="/logo.png" alt="Metland" width={132} height={24} priority className="h-6 w-auto" />
         </div>
         <div>
           <div className="max-w-[420px] text-white font-bold text-4xl leading-tight tracking-tight" style={{ fontFamily: "var(--font-hanken)" }}>

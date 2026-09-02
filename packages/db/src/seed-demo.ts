@@ -1,5 +1,6 @@
 import { createClient } from "@libsql/client";
 import { randomUUID } from "crypto";
+import bcrypt from "bcryptjs";
 import { pmPermissions, cataloguePermissions, seedPermissions } from "./seed.js";
 
 async function seedRoles(
@@ -41,14 +42,29 @@ async function main() {
   const cdb = cUrl === url && cToken === token ? db : createClient({ url: cUrl ?? url, authToken: cToken ?? token });
 
   const now = new Date().toISOString();
-  // ensure demo users exist (FK)
+
+  // Seed password. Override per environment; the fallback exists so a local
+  // `pnpm seed` works without setup, and is refused outside development.
+  const seedPassword = process.env.SEED_PASSWORD ?? "Demo1234";
+  if (!process.env.SEED_PASSWORD && process.env.NODE_ENV === "production") {
+    throw new Error("SEED_PASSWORD must be set when seeding a production database");
+  }
+  if (seedPassword.length < 8) throw new Error("SEED_PASSWORD must be at least 8 characters");
+  const passwordHash = await bcrypt.hash(seedPassword, 10);
+
+  // ensure demo users exist (FK). Re-running resets the password to the current
+  // seed value so a rotated SEED_PASSWORD actually takes effect.
   for (const u of [{id:"demo-user", email:"demo@metland.co.id", name:"Demo User"}, {id:"manager-1", email:"manager@metland.co.id", name:"Manager"}, {id:"procurement-1", email:"procurement@metland.co.id", name:"Procurement"}]) {
-    const ex = await db.execute({ sql: "SELECT id FROM users WHERE id=?", args: [u.id] });
-    if (!ex.rows.length) await db.execute({ sql: "INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, 'demo')", args: [u.id, u.email, u.name] });
-    // also ensure in catalogue DB if separate
-    if (cdb !== db) {
-      const cex = await cdb.execute({ sql: "SELECT id FROM users WHERE id=?", args: [u.id] });
-      if (!cex.rows.length) await cdb.execute({ sql: "INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, 'demo')", args: [u.id, u.email, u.name] });
+    for (const target of cdb !== db ? [db, cdb] : [db]) {
+      const ex = await target.execute({ sql: "SELECT id FROM users WHERE id=?", args: [u.id] });
+      if (ex.rows.length) {
+        await target.execute({ sql: "UPDATE users SET password_hash=? WHERE id=?", args: [passwordHash, u.id] });
+      } else {
+        await target.execute({
+          sql: "INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, ?)",
+          args: [u.id, u.email, u.name, passwordHash],
+        });
+      }
     }
   }
 
