@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderKanban, FolderHeart, Archive, CheckSquare, CalendarDays, Files, BarChart3, Bell, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, FolderKanban, FolderHeart, Archive, CalendarDays, Files, BarChart3, Bell, ShieldCheck, Bot } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 
 const nav = [
@@ -11,12 +11,12 @@ const nav = [
   { href: "/projects", label: "All Projects", icon: FolderKanban },
   { href: "/projects/my", label: "My Projects", icon: FolderHeart },
   { href: "/projects/archive", label: "Project Archive", icon: Archive },
-  { href: "/tasks", label: "Tasks", icon: CheckSquare },
   { href: "/schedule", label: "Schedule", icon: CalendarDays },
   { href: "/documents", label: "Documents", icon: Files },
   { href: "/reports", label: "Reports", icon: BarChart3 },
   { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/approvals", label: "Approvals", icon: ShieldCheck },
+  { href: "/ai", label: "AI Assistant", icon: Bot },
 ];
 
 // Hiding a link is cosmetic — each page calls requirePagePerm() for the real
@@ -38,7 +38,18 @@ function reportPeriod() {
 export function Sidebar({ user, perms = [] }: { user?: { name: string; role: string }; perms?: string[] }) {
   const pathname = usePathname();
   const visibleAdmin = admin.filter((a) => perms.includes("*") || perms.includes(a.perm));
-  const isActive = (href: string) => (href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(href));
+  const isActive = (href: string) => {
+    if (href === "/dashboard") return pathname === "/dashboard";
+    // All Projects: hanya exact /projects
+    if (href === "/projects") return pathname === "/projects";
+    // My Projects: juga aktif saat di project detail (/projects/[uuid] dan sub-routes)
+    if (href === "/projects/my") {
+      if (pathname.startsWith("/projects/my")) return true;
+      if (["/projects/archive", "/projects/new"].some((s) => pathname.startsWith(s))) return false;
+      return pathname.startsWith("/projects/");
+    }
+    return pathname.startsWith(href);
+  };
   const initials = (user?.name ?? "PM")
     .split(" ")
     .map((s) => s[0])

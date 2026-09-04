@@ -4,21 +4,37 @@ import { getSession } from "@/lib/auth";
 import { progressFor } from "@/lib/task-status";
 
 const STATUSES = ["TODO", "IN_PROGRESS", "BLOCKED", "DONE", "CANCELLED"] as const;
+const PRIORITIES = ["LOW", "MEDIUM", "HIGH", "CRITICAL"] as const;
 type Status = (typeof STATUSES)[number];
 
-/** Kanban drag lands here. Any column may move to any other — a board that
- * refuses a drag mid-gesture is worse than one that trusts the user, and unlike
- * documents there is no approval gate on task state. */
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const body = await req.json().catch(() => ({}));
-  const to = String((body as { status?: unknown }).status ?? "");
-  if (!STATUSES.includes(to as Status)) return NextResponse.json({ error: "status invalid" }, { status: 400 });
+  const body = await req.json().catch(() => ({})) as { status?: unknown; priority?: unknown };
 
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const db = getDb();
+
+  // Priority update path
+  if (body.priority !== undefined && body.status === undefined) {
+    const priority = String(body.priority);
+    if (!PRIORITIES.includes(priority as never)) {
+      return NextResponse.json({ error: "priority invalid" }, { status: 400 });
+    }
+    const rs = await db.execute({ sql: "SELECT project_id FROM tasks WHERE id = ?", args: [id] });
+    if (!rs.rows.length) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    await db.execute({
+      sql: "UPDATE tasks SET priority = ?, updated_at = ? WHERE id = ?",
+      args: [priority, new Date().toISOString(), id],
+    });
+    return NextResponse.json({ data: { id, priority } });
+  }
+
+  // Status update path (original behavior)
+  const to = String(body.status ?? "");
+  if (!STATUSES.includes(to as Status)) return NextResponse.json({ error: "status invalid" }, { status: 400 });
+
   const rs = await db.execute({ sql: "SELECT project_id, status FROM tasks WHERE id = ?", args: [id] });
   if (!rs.rows.length) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const row = rs.rows[0] as unknown as { project_id: string; status: string };

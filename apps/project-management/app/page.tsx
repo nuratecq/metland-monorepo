@@ -11,9 +11,9 @@ const MODULES = [
   },
   {
     mark: "AI",
-    title: "AI Catalogue",
-    body: "Cari dan bandingkan kontraktor & material dengan pencarian berbasis bahasa natural dan skor kecocokan otomatis.",
-    tags: ["Kontraktor", "Material"],
+    title: "AI Assistant",
+    body: "Tanya pertanyaan tentang proyek, analisis data, identifikasi risiko, dan dapatkan rekomendasi tindakan berbasis data real-time.",
+    tags: ["Insights", "Analisis"],
   },
   {
     mark: "OP",

@@ -1,12 +1,11 @@
 import { getDb } from "@/lib/turso";
-import { Table, Th, Td } from "@metland/ui";
 import { FieldUpdateForm } from "@/components/forms/FieldUpdateForm";
 import { InlineCreate } from "@/components/forms/InlineCreate";
 import { DocumentUpload } from "@/components/forms/DocumentUpload";
 import { DocumentStatus } from "@/components/forms/DocumentStatus";
-import { TaskFilters } from "@/components/projects/TaskFilters";
 import { buildProjectInsight } from "@/lib/insight";
-import { HEALTH_STYLE, PROJECT_STATUS_LABEL, TASK_STATUS_STYLE, SEVERITY_STYLE, DOC_STATUS_STYLE } from "@/lib/status-styles";
+import { HEALTH_STYLE, PROJECT_STATUS_LABEL, SEVERITY_STYLE, DOC_STATUS_STYLE } from "@/lib/status-styles";
+import { CheckSquare } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -19,21 +18,16 @@ type Project = {
   manager_name: string | null; created_at: string;
 };
 type Milestone = { id: string; name: string; completion_percentage: number; status: string; due_date: string | null };
-type Task = { id: string; title: string; status: string; due_date: string | null; assignee_name: string | null };
 type Issue = { id: string; title: string; severity: string; status: string };
 type AuditLog = { id: string; action: string; new_value: string | null; created_at: string };
 type Doc = { id: string; file_name: string; category: string | null; status: string; file_size: number; uploader_name: string | null };
 
 export default async function ProjectDetail({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const { id } = await params;
-  const sp = await searchParams;
-  const taskStatus = sp.taskStatus ?? "";
   const db = getDb();
 
   const projectRs = await db
@@ -50,12 +44,15 @@ export default async function ProjectDetail({
     .then((r) => r.rows as unknown as Milestone[])
     .catch(() => []);
 
-  let taskSql = `SELECT t.id, t.title, t.status, t.due_date, u.name as assignee_name
-                 FROM tasks t LEFT JOIN users u ON u.id = t.assignee_id WHERE t.project_id = ?`;
-  const taskArgs: unknown[] = [id];
-  if (taskStatus) { taskSql += " AND t.status = ?"; taskArgs.push(taskStatus); }
-  taskSql += " ORDER BY t.due_date ASC LIMIT 30";
-  const tasks = await db.execute({ sql: taskSql, args: taskArgs as never[] }).then((r) => r.rows as unknown as Task[]).catch(() => []);
+  const today = new Date().toISOString().slice(0, 10);
+
+  const overdueTasksRs = await db
+    .execute({
+      sql: `SELECT COUNT(*) as cnt FROM tasks WHERE project_id = ? AND due_date < ? AND status NOT IN ('DONE', 'CANCELLED')`,
+      args: [id, today],
+    })
+    .catch(() => ({ rows: [{ cnt: 0 }] }));
+  const overdueTasks = Number((overdueTasksRs.rows[0] as unknown as { cnt: number })?.cnt ?? 0);
 
   const issues = await db
     .execute({ sql: "SELECT id, title, severity, status FROM issues WHERE project_id = ? ORDER BY created_at DESC LIMIT 10", args: [id] })
@@ -77,9 +74,7 @@ export default async function ProjectDetail({
     .then((r) => r.rows as unknown as AuditLog[])
     .catch(() => []);
 
-  const today = new Date().toISOString().slice(0, 10);
   const overdueMilestones = milestones.filter((m) => m.due_date && m.due_date < today && m.status !== "DONE").length;
-  const overdueTasks = tasks.filter((t) => t.due_date && t.due_date < today && t.status !== "DONE" && t.status !== "CANCELLED").length;
   const daysToDeadline = project.planned_end_date
     ? Math.ceil((new Date(project.planned_end_date).getTime() - new Date(today).getTime()) / 86400000)
     : null;
@@ -96,9 +91,20 @@ export default async function ProjectDetail({
 
   return (
     <div className="space-y-6">
-      <Link href="/projects" className="inline-flex h-8 items-center px-3 border border-[var(--color-outline-variant)] bg-white rounded text-[13px] font-semibold text-[var(--color-on-surface-variant)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]">
-        ← Semua proyek
-      </Link>
+      <div className="flex items-center gap-2">
+        <Link href="/projects" className="inline-flex h-8 items-center px-3 border border-[var(--color-outline-variant)] bg-white rounded text-[13px] font-semibold text-[var(--color-on-surface-variant)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors">
+          ← Semua proyek
+        </Link>
+        <Link href={`/projects/${id}/tasks`} className="inline-flex h-8 items-center gap-1.5 px-3 border border-[var(--color-outline-variant)] bg-white rounded text-[13px] font-semibold text-[var(--color-on-surface-variant)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors">
+          <CheckSquare size={14} className="shrink-0" />
+          Tasks
+          {overdueTasks > 0 && (
+            <span className="ml-0.5 h-[18px] min-w-[18px] px-1 rounded-full bg-[var(--color-error)] text-white text-[11px] font-bold inline-flex items-center justify-center">
+              {overdueTasks}
+            </span>
+          )}
+        </Link>
+      </div>
 
       <div className="flex items-start gap-4">
         <div className="min-w-0">
@@ -132,10 +138,14 @@ export default async function ProjectDetail({
           <div className="mt-2 text-3xl font-bold" style={{ fontFamily: "var(--font-hanken)", color: h.color }}>{h.label}</div>
           <div className="mt-1 text-[13px] text-[var(--color-outline)]">{PROJECT_STATUS_LABEL[project.status] ?? project.status}</div>
         </div>
-        <div className="bg-white border border-[var(--color-outline-variant)] rounded p-4">
+        <Link
+          href={`/projects/${id}/tasks`}
+          className="bg-white border border-[var(--color-outline-variant)] rounded p-4 hover:border-[var(--color-primary)] transition-colors group"
+        >
           <div className="text-xs font-semibold tracking-wide uppercase text-[var(--color-outline)]">Task Terlambat</div>
-          <div className="mt-2 text-3xl font-bold" style={{ fontFamily: "var(--font-hanken)" }}>{overdueTasks}</div>
-        </div>
+          <div className="mt-2 text-3xl font-bold group-hover:text-[var(--color-primary)] transition-colors" style={{ fontFamily: "var(--font-hanken)", color: overdueTasks > 0 ? "var(--color-error)" : undefined }}>{overdueTasks}</div>
+          <div className="mt-1 text-[13px] text-[var(--color-outline)] group-hover:text-[var(--color-primary)] transition-colors">Lihat tasks →</div>
+        </Link>
         <div className="bg-white border border-[var(--color-outline-variant)] rounded p-4">
           <div className="text-xs font-semibold tracking-wide uppercase text-[var(--color-outline)]">Hari ke Tenggat</div>
           <div className="mt-2 text-3xl font-bold" style={{ fontFamily: "var(--font-hanken)" }}>{daysToDeadline ?? "—"}</div>
@@ -168,45 +178,6 @@ export default async function ProjectDetail({
                 ))
               )}
             </div>
-          </div>
-
-          <div className="bg-white border border-[var(--color-outline-variant)] rounded">
-            <div className="px-4 py-3.5 border-b border-[var(--color-outline-variant)] flex items-center gap-3 flex-wrap">
-              <div className="font-semibold" style={{ fontFamily: "var(--font-hanken)" }}>Task lapangan</div>
-              <div className="flex-1" />
-              <TaskFilters projectId={id} active={taskStatus} />
-            </div>
-            <Table>
-              <thead>
-                <tr>
-                  <Th>Pekerjaan</Th>
-                  <Th>Penanggung jawab</Th>
-                  <Th>Status</Th>
-                  <Th>Jatuh tempo</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {tasks.length === 0 ? (
-                  <tr><Td colSpan={4} className="text-center py-8 text-[var(--color-on-surface-variant)]">Tidak ada task pada filter ini.</Td></tr>
-                ) : (
-                  tasks.map((t) => {
-                    const ts = TASK_STATUS_STYLE[t.status] ?? TASK_STATUS_STYLE.TODO;
-                    return (
-                      <tr key={t.id}>
-                        <Td>{t.title}</Td>
-                        <Td className="text-[var(--color-on-surface-variant)]">{t.assignee_name ?? "—"}</Td>
-                        <Td>
-                          <span className="h-[22px] px-2 inline-flex items-center rounded text-xs font-semibold tracking-wide uppercase" style={{ background: ts.bg, color: ts.color }}>
-                            {ts.label}
-                          </span>
-                        </Td>
-                        <Td className="font-mono text-[13px] text-[var(--color-on-surface-variant)]">{t.due_date ?? "—"}</Td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </Table>
           </div>
 
           {issues.length > 0 ? (

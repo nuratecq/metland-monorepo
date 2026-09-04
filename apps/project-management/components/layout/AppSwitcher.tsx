@@ -1,15 +1,30 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function AppSwitcher() {
+  const pathname = usePathname();
+  const isAi = pathname.startsWith("/ai");
+
   const apps = [
-    { name: "Project Management", href: process.env.NEXT_PUBLIC_PM_URL ?? "http://localhost:3001", current: true },
-    { name: "AI Catalogue", href: process.env.NEXT_PUBLIC_CATALOGUE_URL ?? "http://localhost:3000", current: false },
+    { name: "Project Management", href: "/dashboard", active: !isAi },
+    { name: "AI Assistant", href: "/ai", active: isAi },
   ];
+
   return (
-    <div className="flex gap-1 p-1 bg-[var(--color-surface-container)] rounded">
-      {apps.map(a=>(
-        <Link key={a.name} href={a.href} className={`px-3 py-1 text-xs rounded ${a.current ? "bg-[var(--color-primary)] text-white" : "hover:bg-white"}`}>{a.name}</Link>
+    <div className="flex gap-0 p-1 bg-[var(--color-surface-container)] rounded-lg">
+      {apps.map((a) => (
+        <Link
+          key={a.name}
+          href={a.href}
+          className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            a.active
+              ? "bg-[var(--color-primary)] text-white shadow-sm"
+              : "text-[var(--color-on-surface-variant,#6b7280)] hover:text-[var(--color-on-surface,#111)]"
+          }`}
+        >
+          {a.name}
+        </Link>
       ))}
     </div>
   );
