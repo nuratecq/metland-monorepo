@@ -48,19 +48,16 @@ function WorkloadBar({ value, max = 10 }: { value: number; max?: number }) {
   const color =
     pct >= 80 ? "var(--color-error)" : pct >= 50 ? "#f59e0b" : "var(--color-primary)";
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-[11px] text-[var(--color-outline)]">Workload</span>
-        <span className="font-mono text-[11px] text-[var(--color-data-mono)]">
-          {value} task aktif
-        </span>
-      </div>
-      <div className="h-1.5 rounded-full bg-[var(--color-surface-container-high)] overflow-hidden">
+    <div className="flex items-center gap-2 min-w-[120px]">
+      <div className="flex-1 h-1.5 rounded-full bg-[var(--color-surface-container-high)] overflow-hidden">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${pct}%`, background: color }}
         />
       </div>
+      <span className="font-mono text-[11px] text-[var(--color-outline)] w-4 text-right shrink-0">
+        {value}
+      </span>
     </div>
   );
 }
@@ -189,7 +186,7 @@ export default async function EmployeesPage() {
         ))}
       </div>
 
-      {/* Employee grid */}
+      {/* Employee table */}
       {employees.length === 0 ? (
         <div className="rounded-lg border border-[var(--color-outline-variant)] bg-white text-center py-16 px-5">
           <Users size={36} className="mx-auto text-[var(--color-outline-variant)] mb-3" />
@@ -201,74 +198,102 @@ export default async function EmployeesPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {employees.map((emp) => {
-            const st = STATUS_STYLE[emp.status] ?? STATUS_STYLE.ACTIVE;
-            const projects = projectsByUser[emp.id] ?? [];
-            return (
-              <div
-                key={emp.id}
-                className="bg-white border border-[var(--color-outline-variant)] rounded-lg p-4 flex flex-col gap-3"
-              >
-                {/* Top row: avatar + name + status */}
-                <div className="flex items-start gap-3">
-                  <div
-                    className="w-10 h-10 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center text-[14px] font-semibold shrink-0"
+        <div className="rounded-lg border border-[var(--color-outline-variant)] bg-white overflow-x-auto">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="border-b border-[var(--color-outline-variant)] bg-[var(--color-surface-container-low)]">
+                <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-[var(--color-outline)] w-[240px]">
+                  Karyawan
+                </th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-[var(--color-outline)]">
+                  Role
+                </th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-[var(--color-outline)]">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-[var(--color-outline)]">
+                  Projects
+                </th>
+                <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-[var(--color-outline)] w-[160px]">
+                  Workload
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {employees.map((emp, idx) => {
+                const st = STATUS_STYLE[emp.status] ?? STATUS_STYLE.ACTIVE;
+                const projects = projectsByUser[emp.id] ?? [];
+                return (
+                  <tr
+                    key={emp.id}
+                    className={`border-b border-[var(--color-outline-variant)] last:border-0 hover:bg-[var(--color-surface-container-low)] transition-colors${idx % 2 === 1 ? " bg-[var(--color-surface)]" : ""}`}
                   >
-                    {initials(emp.name)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-semibold text-[14px] text-[var(--color-on-surface)] truncate">
-                      {emp.name}
-                    </div>
-                    <div className="text-[12px] text-[var(--color-outline)] truncate">
-                      {emp.roles ?? "—"}
-                    </div>
-                  </div>
-                  <span
-                    className="h-[20px] px-2 inline-flex items-center rounded text-[11px] font-semibold tracking-wide uppercase shrink-0"
-                    style={{ background: st.bg, color: st.color }}
-                  >
-                    {st.label}
-                  </span>
-                </div>
+                    {/* Name + email */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center text-[12px] font-semibold shrink-0">
+                          {initials(emp.name)}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-semibold text-[13px] text-[var(--color-on-surface)] truncate">
+                            {emp.name}
+                          </div>
+                          <div className="text-[11px] text-[var(--color-outline)] truncate">
+                            {emp.email}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
 
-                {/* Projects */}
-                <div>
-                  <div className="text-[11px] font-semibold tracking-wide uppercase text-[var(--color-outline)] mb-1.5">
-                    Projects ({projects.length})
-                  </div>
-                  {projects.length === 0 ? (
-                    <span className="text-[12px] text-[var(--color-outline)]">
-                      Tidak ada project aktif
-                    </span>
-                  ) : (
-                    <div className="flex flex-wrap gap-1.5">
-                      {projects.map((p) => (
-                        <span
-                          key={p.project_id}
-                          className="inline-flex items-center gap-1 h-[22px] px-2 rounded border border-[var(--color-outline-variant)] text-[11px] font-mono text-[var(--color-on-surface-variant)]"
-                          title={p.project_name}
-                        >
-                          <span
-                            className="w-1.5 h-1.5 rounded-full shrink-0"
-                            style={{
-                              background:
-                                PROJECT_STATUS_DOT[p.project_status] ?? "#94a3b8",
-                            }}
-                          />
-                          {p.project_code}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                    {/* Role */}
+                    <td className="px-4 py-3 text-[13px] text-[var(--color-on-surface-variant)]">
+                      {emp.roles ?? <span className="text-[var(--color-outline)]">—</span>}
+                    </td>
 
-                {/* Workload */}
-                <WorkloadBar value={emp.active_tasks} />
-              </div>
-            );
-          })}
+                    {/* Status */}
+                    <td className="px-4 py-3">
+                      <span
+                        className="h-[20px] px-2 inline-flex items-center rounded text-[11px] font-semibold tracking-wide uppercase"
+                        style={{ background: st.bg, color: st.color }}
+                      >
+                        {st.label}
+                      </span>
+                    </td>
+
+                    {/* Projects */}
+                    <td className="px-4 py-3">
+                      {projects.length === 0 ? (
+                        <span className="text-[12px] text-[var(--color-outline)]">—</span>
+                      ) : (
+                        <div className="flex flex-wrap gap-1">
+                          {projects.map((p) => (
+                            <span
+                              key={p.project_id}
+                              className="inline-flex items-center gap-1 h-[20px] px-1.5 rounded border border-[var(--color-outline-variant)] text-[11px] font-mono text-[var(--color-on-surface-variant)]"
+                              title={p.project_name}
+                            >
+                              <span
+                                className="w-1.5 h-1.5 rounded-full shrink-0"
+                                style={{
+                                  background: PROJECT_STATUS_DOT[p.project_status] ?? "#94a3b8",
+                                }}
+                              />
+                              {p.project_code}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+
+                    {/* Workload */}
+                    <td className="px-4 py-3">
+                      <WorkloadBar value={emp.active_tasks} />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
