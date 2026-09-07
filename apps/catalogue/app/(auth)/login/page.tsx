@@ -42,7 +42,7 @@ function LoginForm() {
   return (
     <div>
       <h1 className="text-[32px] leading-10 font-semibold" style={{ fontFamily: "var(--font-hanken)" }}>Masuk</h1>
-      <p className="mt-2.5 mb-8 text-[15px] text-[var(--color-on-surface-variant)]">Gunakan email korporat Metland Anda.</p>
+      <p className="mt-2.5 mb-8 text-[15px] text-[var(--color-on-surface-variant)]">Gunakan email korporat Anda.</p>
 
       {error ? (
         <div className="mb-[18px] px-3.5 py-3 rounded bg-[var(--color-error-container)] border border-[#f5b8b3] text-[#93000a] text-sm">
@@ -57,7 +57,7 @@ function LoginForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="nama@metland.co.id"
+          placeholder="nama@company.com"
           className="mt-1.5 w-full h-11 px-3.5 border border-[#cbd5e1] rounded bg-white text-[15px] focus:outline-none focus:border-[var(--color-primary)]"
         />
 

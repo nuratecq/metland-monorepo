@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, Badge } from "@metland/ui";
 type Rec = { contractor: { id:string; company_name:string; company_code:string; description:string; location:string; spec_name:string }; score:number; match:string; reasons:string[]; explanation:string };
 
 export default function AISearchPage() {
-  const [q, setQ] = useState("Cari kontraktor struktur untuk proyek high rise di Bekasi");
+  const [q, setQ] = useState("Cari vendor untuk kebutuhan produksi di Jakarta");
   const [loading, setLoading] = useState(false);
   const [recs, setRecs] = useState<Rec[]>([]);
   const [recId, setRecId] = useState<string | null>(null);
@@ -24,7 +24,7 @@ export default function AISearchPage() {
       if (!res.ok) throw new Error(res.status === 403 ? "Peran Anda tidak punya izin recommendation.create — hubungi admin." : String(j.error ?? "Pencarian gagal"));
       setRecs(j.recommendations ?? []);
       setRecId(j.recommendation_id ?? null);
-      if (!(j.recommendations ?? []).length) setNotice("Tidak ada kontraktor yang cocok untuk query ini.");
+      if (!(j.recommendations ?? []).length) setNotice("Tidak ada vendor yang cocok untuk query ini.");
     } catch (e) {
       setRecs([]);
       setError(e instanceof Error ? e.message : "Pencarian gagal");
@@ -53,7 +53,7 @@ export default function AISearchPage() {
 
       <Card className="border-l-4 border-l-[var(--color-primary)]">
         <CardContent className="p-4 flex gap-2">
-          <input value={q} onChange={e=>setQ(e.target.value)} className="flex-1 border rounded px-3 py-2 text-sm" placeholder="Cari kontraktor struktur untuk proyek high rise" />
+          <input value={q} onChange={e=>setQ(e.target.value)} className="flex-1 border rounded px-3 py-2 text-sm" placeholder="Cari vendor untuk kebutuhan produksi" />
           <button onClick={search} disabled={loading} className="bg-[var(--color-primary)] text-white px-4 py-2 rounded text-sm">{loading? "Searching...":"AI Search"}</button>
         </CardContent>
       </Card>

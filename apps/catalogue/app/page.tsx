@@ -6,15 +6,15 @@ import { getSession } from "@/lib/auth";
 const FEATURES = [
   {
     title: "Cari dengan bahasa natural",
-    body: "“Kontraktor struktur untuk high rise di Bekasi” — tanpa filter berlapis, tanpa kode vendor.",
+    body: "“Vendor terpercaya untuk kebutuhan produksi di Jakarta” — tanpa filter berlapis, tanpa kode vendor.",
   },
   {
     title: "Bandingkan berbasis skor",
-    body: "Kecocokan kontraktor dan material dinilai otomatis dari data historis, bukan tebak-tebakan.",
+    body: "Kecocokan vendor dan produk dinilai otomatis dari data historis, bukan tebak-tebakan.",
   },
   {
     title: "Persetujuan yang terlacak",
-    body: "Rekomendasi mengalir ke procurement lewat alur approval yang punya jejak audit.",
+    body: "Rekomendasi mengalir ke tim pengadaan lewat alur approval yang punya jejak audit.",
   },
 ];
 
@@ -28,7 +28,7 @@ export default async function LandingPage() {
       <header className="h-16 shrink-0 border-b border-[var(--color-outline-variant)]">
         <div className="mx-auto flex h-full max-w-[1120px] items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="Metland" width={104} height={18} priority className="h-[18px] w-auto" />
+            <Image src="/logo.png" alt="Nuratech" width={28} height={28} priority className="h-7 w-auto" />
             <span className="text-sm text-[var(--color-on-surface-variant)]">Catalogue</span>
           </div>
           <Link href={session ? "/dashboard" : "/login"}>
@@ -46,11 +46,11 @@ export default async function LandingPage() {
             className="mt-4 max-w-[720px] text-4xl font-bold leading-tight tracking-tight md:text-5xl"
             style={{ fontFamily: "var(--font-hanken)" }}
           >
-            Temukan kontraktor & material yang tepat, lebih cepat.
+            Temukan vendor & produk yang tepat, lebih cepat.
           </h1>
           <p className="mt-5 max-w-[560px] text-base leading-relaxed text-[var(--color-on-surface-variant)]">
-            Satu katalog untuk mencari, membandingkan, dan mengajukan persetujuan procurement di seluruh
-            proyek Metland.
+            Satu katalog untuk mencari, membandingkan, dan mengajukan persetujuan pengadaan di seluruh
+            proyek Anda.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-3 text-white">
             <Link href={session ? "/dashboard" : "/login"}>
@@ -92,7 +92,7 @@ export default async function LandingPage() {
 
       <footer className="border-t border-[var(--color-outline-variant)]">
         <div className="mx-auto max-w-[1120px] px-6 py-6 font-mono text-xs text-[var(--color-on-surface-variant)]">
-          PT Metropolitan Land Tbk · 2026
+          Nuratech Digital Nusantara · 2026
         </div>
       </footer>
     </div>

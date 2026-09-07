@@ -1,9 +1,9 @@
 import Image from "next/image";
 
 const AUTH_POINTS = [
-  "Cari kontraktor & material dengan bahasa natural",
+  "Cari vendor & produk dengan bahasa natural",
   "Skor kecocokan otomatis, bukan tebak-tebakan",
-  "Alur persetujuan procurement yang terlacak jelas",
+  "Alur persetujuan pengadaan yang terlacak jelas",
 ];
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -11,14 +11,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen grid md:grid-cols-[0.92fr_1.08fr] bg-white">
       <div className="hidden md:flex flex-col justify-between p-12 bg-[var(--color-primary)]">
         <div className="self-start bg-white rounded px-4 py-3">
-          <Image src="/logo.png" alt="Metland" width={132} height={24} priority className="h-6 w-auto" />
+          <Image src="/logo.png" alt="Nuratech" width={40} height={40} priority className="h-9 w-auto" />
         </div>
         <div>
           <div className="max-w-[420px] text-white font-bold text-4xl leading-tight tracking-tight" style={{ fontFamily: "var(--font-hanken)" }}>
-            Temukan kontraktor & material yang tepat, lebih cepat.
+            Temukan vendor & produk yang tepat, lebih cepat.
           </div>
           <div className="mt-4 max-w-[400px] text-[#c8eaea] text-base leading-relaxed">
-            Masuk untuk mencari, membandingkan, dan mengajukan persetujuan procurement.
+            Masuk untuk mencari, membandingkan, dan mengajukan persetujuan pengadaan.
           </div>
           <div className="mt-10 flex flex-col gap-3">
             {AUTH_POINTS.map((p) => (
@@ -29,7 +29,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             ))}
           </div>
         </div>
-        <div className="font-mono text-xs text-[#8cc9c9]">PT Metropolitan Land Tbk · 2026</div>
+        <div className="font-mono text-xs text-[#8cc9c9]">Nuratech Digital Nusantara · 2026</div>
       </div>
 
       <div className="flex items-center justify-center p-6 md:p-12">

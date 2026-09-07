@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getDb } from "@/lib/turso";
 import { getSession } from "@/lib/auth";
@@ -12,8 +13,8 @@ const MODULES = [
   {
     mark: "AI",
     title: "AI Catalogue",
-    body: "Cari dan bandingkan kontraktor & material dengan pencarian berbasis bahasa natural dan skor kecocokan otomatis.",
-    tags: ["Kontraktor", "Material"],
+    body: "Cari dan bandingkan vendor & produk dengan pencarian berbasis bahasa natural dan skor kecocokan otomatis.",
+    tags: ["Vendor", "Katalog"],
   },
   {
     mark: "OP",
@@ -24,7 +25,7 @@ const MODULES = [
 ];
 
 const BULLETS = [
-  "Site manager mengunggah progres harian langsung dari lapangan.",
+  "Tim mengunggah progres harian langsung dari lapangan.",
   "Sistem menghitung deviasi jadwal dan status kesehatan proyek otomatis.",
   "Proyek yang berisiko atau terlambat langsung ditandai untuk ditindaklanjuti.",
 ];
@@ -64,7 +65,10 @@ export default async function LandingPage() {
     <div className="min-h-screen bg-[var(--color-surface)]">
       <header className="sticky top-0 z-20 bg-[var(--color-surface)]/95 backdrop-blur border-b border-[var(--color-outline-variant)]">
         <div className="max-w-[1440px] mx-auto px-8 h-[72px] flex items-center gap-10">
-          <span className="font-bold tracking-tight text-lg" style={{ fontFamily: "var(--font-hanken)" }}>METLAND</span>
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo.png" alt="Nuratech" width={28} height={28} priority className="h-7 w-auto" />
+            <span className="font-bold tracking-tight text-lg" style={{ fontFamily: "var(--font-hanken)" }}>NURATECH</span>
+          </Link>
           <nav className="hidden md:flex items-center gap-7 ml-2">
             <a href="#modul" className="text-sm font-medium text-[var(--color-on-surface-variant)]">Modul</a>
             <a href="#kinerja" className="text-sm font-medium text-[var(--color-on-surface-variant)]">Kinerja</a>
@@ -88,10 +92,10 @@ export default async function LandingPage() {
             Digital Ecosystem · Internal
           </div>
           <h1 className="mt-5 text-4xl md:text-[56px] md:leading-[62px] font-bold tracking-tight text-[var(--color-on-surface)]" style={{ fontFamily: "var(--font-hanken)" }}>
-            Satu ruang kendali untuk seluruh proyek konstruksi Metland.
+            Satu ruang kendali untuk seluruh proyek Anda.
           </h1>
           <p className="mt-6 max-w-[560px] text-lg leading-7 text-[var(--color-on-surface-variant)]">
-            Progres lapangan, task tim, dan risiko jadwal — terkumpul dalam satu sistem operasional yang dipakai project manager, kontraktor, dan tim pengadaan setiap hari.
+            Progres, task tim, dan risiko jadwal — terkumpul dalam satu sistem operasional yang dipakai project manager dan tim Anda setiap hari.
           </p>
           <div className="mt-9 flex items-center gap-3.5">
             <Link href="/login" className="h-12 px-6.5 flex items-center bg-[var(--color-primary)] rounded text-[15px] font-semibold text-white hover:bg-[var(--color-primary-container)]">
@@ -114,7 +118,7 @@ export default async function LandingPage() {
             <div className="w-px bg-[var(--color-outline-variant)]" />
             <div>
               <div className="text-3xl font-bold text-[var(--color-primary)]" style={{ fontFamily: "var(--font-hanken)" }}>{hero.locations}</div>
-              <div className="mt-0.5 text-[13px] text-[var(--color-on-surface-variant)]">kawasan</div>
+              <div className="mt-0.5 text-[13px] text-[var(--color-on-surface-variant)]">lokasi</div>
             </div>
           </div>
         </div>
@@ -122,7 +126,7 @@ export default async function LandingPage() {
         <div className="bg-white border border-[var(--color-outline-variant)] rounded-lg overflow-hidden shadow-[0_18px_44px_rgba(23,29,28,0.08)]">
           <div className="h-10 px-3.5 flex items-center gap-2 bg-[var(--color-surface-container-low)] border-b border-[var(--color-outline-variant)]">
             <div className="w-[9px] h-[9px] rounded-full bg-[var(--color-status-green)]" />
-            <div className="font-mono text-xs text-[var(--color-data-mono)]">ecosystem.metland.co.id/projects</div>
+            <div className="font-mono text-xs text-[var(--color-data-mono)]">ecosystem.nuratech.id/projects</div>
           </div>
           <div className="p-5">
             <div className="grid grid-cols-3 gap-3">
@@ -242,7 +246,7 @@ export default async function LandingPage() {
             <div className="text-[28px] leading-9 font-semibold text-white" style={{ fontFamily: "var(--font-hanken)" }}>
               Siap dipakai tim proyek Anda hari ini.
             </div>
-            <div className="mt-2 text-[15px] text-[#c8eaea]">Akses menggunakan akun email korporat Metland.</div>
+            <div className="mt-2 text-[15px] text-[#c8eaea]">Akses menggunakan akun korporat Anda.</div>
           </div>
           <Link href="/login" className="h-12 px-7 flex-none flex items-center bg-white rounded text-[15px] font-semibold text-[var(--color-primary)] hover:bg-[var(--color-surface)]">
             Masuk sekarang
@@ -253,8 +257,8 @@ export default async function LandingPage() {
       <footer className="bg-[var(--color-inverse-surface)]">
         <div className="max-w-[1440px] mx-auto px-8 py-10 flex items-center justify-between gap-6">
           <div className="flex flex-col gap-1.5">
-            <div className="text-xl font-bold text-[var(--color-inverse-on-surface)]" style={{ fontFamily: "var(--font-hanken)" }}>Metland Ecosystem</div>
-            <div className="text-[13px] text-[var(--color-outline-variant)]">PT Metropolitan Land Tbk · Sistem internal</div>
+            <div className="text-xl font-bold text-[var(--color-inverse-on-surface)]" style={{ fontFamily: "var(--font-hanken)" }}>Nuratech Ecosystem</div>
+            <div className="text-[13px] text-[var(--color-outline-variant)]">Nuratech Digital Nusantara · Sistem internal</div>
           </div>
           <div className="font-mono text-xs text-[var(--color-outline)]">v1.0 · build 2026.09</div>
         </div>

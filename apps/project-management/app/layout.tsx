@@ -19,7 +19,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "METLAND Project Management",
+  title: "Nuratech Project Management",
   description: "Operational Project System — Plan → Execute → Monitor → Report",
 };
 

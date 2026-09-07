@@ -41,7 +41,7 @@ export function Sidebar({ user, perms = [] }: { user?: { name: string; role: str
   return (
     <aside className="w-[244px] shrink-0 border-r border-[var(--color-outline-variant)] bg-white hidden md:flex flex-col">
       <div className="h-16 flex items-center gap-2 px-5 border-b border-[var(--color-outline-variant)] font-bold tracking-tight" style={{ fontFamily: "var(--font-hanken)" }}>
-        <Image src="/logo.png" alt="Metland" width={104} height={18} priority className="h-[18px] w-auto" />
+        <Image src="/logo.png" alt="Nuratech" width={28} height={28} priority className="h-7 w-auto" />
         <span className="text-sm text-[var(--color-on-surface-variant)]">Catalogue</span>
       </div>
       <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">

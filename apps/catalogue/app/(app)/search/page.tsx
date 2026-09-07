@@ -21,7 +21,7 @@ export default function SearchPage() {
       <p className="text-sm text-[var(--color-on-surface-variant)]">Search powerful tanpa AI — filter Category/Spec/Location/Price</p>
       <div className="flex gap-2">
         <select value={type} onChange={e=>setType(e.target.value as never)} className="border rounded px-3 py-2 text-sm"><option value="contractor">Contractor</option><option value="material">Material</option></select>
-        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Cari kontraktor struktur..." className="flex-1 border rounded px-3 py-2 text-sm" />
+        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Cari vendor atau produk..." className="flex-1 border rounded px-3 py-2 text-sm" />
         <button onClick={doSearch} disabled={loading} className="bg-[var(--color-primary)] text-white px-4 py-2 rounded text-sm">{loading? "...":"Search"}</button>
       </div>
       <div className="grid gap-3">

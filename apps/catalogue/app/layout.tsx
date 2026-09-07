@@ -19,7 +19,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "METLAND AI Catalogue",
+  title: "Nuratech AI Catalogue",
   description: "Procurement Intelligence — Discover → Compare → Recommend → Approve",
 };
 

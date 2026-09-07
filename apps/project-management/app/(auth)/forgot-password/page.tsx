@@ -50,7 +50,7 @@ export default function ForgotPasswordPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="nama@metland.co.id"
+              placeholder="nama@company.com"
               className="mt-1.5 w-full h-11 px-3.5 border border-[#cbd5e1] rounded text-[15px] focus:outline-none focus:border-[var(--color-primary)]"
             />
             {error ? <div className="mt-2.5 text-[13px] text-[#93000a]">{error}</div> : null}

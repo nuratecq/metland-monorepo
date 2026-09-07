@@ -1,6 +1,6 @@
-# METLAND Digital Ecosystem
+# Nuratech Digital Ecosystem
 
-Monorepo untuk ekosistem digital METLAND: dua aplikasi independen dengan database terpisah namun identitas pengguna bersama.
+Monorepo untuk ekosistem digital Nuratech: dua aplikasi independen dengan database terpisah namun identitas pengguna bersama.
 
 ## Struktur
 
@@ -9,7 +9,7 @@ apps/
   project-management/   # Manajemen proyek: project, milestone, task, issue, approval, report
   catalogue/            # Katalog kontraktor & material + AI recommendation
 packages/
-  design-system/        # Design tokens (Metland Kinetic)
+  design-system/        # Design tokens
   ui/                   # Komponen UI bersama
   db/                   # Skema & migrasi Turso (libsql)
   auth/                 # JWT session + RBAC helpers
@@ -63,6 +63,6 @@ Lihat `docs/DEMO_ACCOUNTS.md`. Password semua akun demo: `Demo1234`.
 ## Dokumentasi
 
 - `docs/PRD.md` — Product requirements
-- `docs/DESIGN.md` — Design system (Metland Kinetic)
+- `docs/DESIGN.md` — Design system
 - `PLAN.md` — Rencana eksekusi per fase
 - `PROGRESS.md` — Tracker progres per fase

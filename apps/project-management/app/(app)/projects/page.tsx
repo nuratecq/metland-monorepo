@@ -57,7 +57,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-hanken)" }}>Projects</h1>
-          <p className="text-sm text-[var(--color-on-surface-variant)]">Semua proyek konstruksi yang tercatat di sistem.</p>
+          <p className="text-sm text-[var(--color-on-surface-variant)]">Semua proyek yang tercatat di sistem.</p>
         </div>
         <Link href="/projects/new" className="h-9 px-4 flex items-center bg-[var(--color-primary)] text-white rounded text-sm font-semibold hover:bg-[var(--color-primary-container)]">
           + Proyek baru

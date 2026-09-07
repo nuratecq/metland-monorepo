@@ -11,7 +11,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="min-h-screen grid md:grid-cols-[0.92fr_1.08fr] bg-white">
       <div className="hidden md:flex flex-col justify-between p-12 bg-[var(--color-primary)]">
         <div className="self-start bg-white rounded px-4 py-3">
-          <Image src="/logo.png" alt="Metland" width={132} height={24} priority className="h-6 w-auto" />
+          <Image src="/logo.png" alt="Nuratech" width={40} height={40} priority className="h-9 w-auto" />
         </div>
         <div>
           <div className="max-w-[420px] text-white font-bold text-4xl leading-tight tracking-tight" style={{ fontFamily: "var(--font-hanken)" }}>
@@ -29,7 +29,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             ))}
           </div>
         </div>
-        <div className="font-mono text-xs text-[#8cc9c9]">PT Metropolitan Land Tbk · 2026</div>
+        <div className="font-mono text-xs text-[#8cc9c9]">Nuratech Digital Nusantara · 2026</div>
       </div>
 
       <div className="flex items-center justify-center p-6 md:p-12">
