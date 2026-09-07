@@ -447,10 +447,6 @@ function GanttView({
   tasks: TaskItem[];
   onTaskClick: (task: TaskItem) => void;
 }) {
-  const leftRef = useRef<HTMLDivElement>(null);
-  const rightRef = useRef<HTMLDivElement>(null);
-  const syncing = useRef(false);
-
   const withDates = tasks.filter((t) => t.start_date || t.due_date);
   const noDates = tasks.filter((t) => !t.start_date && !t.due_date);
 
@@ -504,158 +500,102 @@ function GanttView({
 
   const todayCol = dayCol(TODAY);
   const totalChartW = totalDays * DAY_W;
-  const HEADER_H = 52; // 28 + 24
+  const HEADER_H = 52;
   const SECTION_H = 33;
+  const border = "1px solid var(--color-outline-variant)";
+  const borderBold = "2px solid var(--color-outline-variant)";
+  const surfaceLow = "var(--color-surface-container-low)";
 
-  function onRightScroll() {
-    if (syncing.current || !leftRef.current || !rightRef.current) return;
-    syncing.current = true;
-    leftRef.current.scrollTop = rightRef.current.scrollTop;
-    syncing.current = false;
-  }
-
-  function onLeftScroll() {
-    if (syncing.current || !leftRef.current || !rightRef.current) return;
-    syncing.current = true;
-    rightRef.current.scrollTop = leftRef.current.scrollTop;
-    syncing.current = false;
-  }
-
+  // Single scroll container — horizontal scroll stays inside this component only.
+  // CSS sticky on label cells replaces the old JS-synced two-panel approach.
   return (
-    // overflow-hidden clips horizontal overflow — card is the scroll boundary
     <div
-      className="rounded-lg border border-[var(--color-outline-variant)] bg-white overflow-hidden flex"
-      style={{ maxHeight: "72vh" }}
+      className="w-full rounded-lg border border-[var(--color-outline-variant)] bg-white"
+      style={{ maxHeight: "72vh", overflowX: "auto", overflowY: "auto" }}
     >
-      {/* LEFT PANEL: frozen label column, vertical scroll synced with right */}
-      <div
-        ref={leftRef}
-        onScroll={onLeftScroll}
-        className="flex-shrink-0 border-r border-[var(--color-outline-variant)] [&::-webkit-scrollbar]:hidden"
-        style={{ width: LABEL_W, overflowY: "auto", overflowX: "hidden", scrollbarWidth: "none" }}
-      >
-        {/* Sticky "Task" header — sticks inside this panel's scroll container */}
-        <div
-          className="sticky top-0 z-20 bg-[var(--color-surface-container-low)] border-b-2 border-[var(--color-outline-variant)] flex items-end px-3 pb-2"
-          style={{ height: HEADER_H }}
-        >
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-outline)]">Task</span>
+      {/* Total content width = label column + chart */}
+      <div style={{ width: LABEL_W + totalChartW, minWidth: LABEL_W + totalChartW }}>
+
+        {/* MONTH HEADER — sticky top */}
+        <div style={{ position: "sticky", top: 0, zIndex: 20, display: "flex", height: 28, borderBottom: border, background: surfaceLow }}>
+          {/* Corner: sticky in both axes */}
+          <div style={{ position: "sticky", left: 0, zIndex: 30, width: LABEL_W, minWidth: LABEL_W, background: surfaceLow, borderRight: border }} />
+          {months.map((m, i) => (
+            <div
+              key={i}
+              className="flex items-center px-2 border-r border-[var(--color-outline-variant)]"
+              style={{ width: m.count * DAY_W, minWidth: m.count * DAY_W, height: 28 }}
+            >
+              <span className="text-[11px] font-semibold text-[var(--color-on-surface-variant)] truncate">{m.label}</span>
+            </div>
+          ))}
         </div>
 
-        {/* Task label rows */}
-        {withDates.map((task) => (
+        {/* DAY HEADER — sticky top (below month row) */}
+        <div style={{ position: "sticky", top: 28, zIndex: 20, display: "flex", height: 24, borderBottom: borderBold, background: surfaceLow }}>
+          {/* Corner: sticky left + shows "Task" label */}
           <div
-            key={task.id}
-            className="flex items-center gap-2 px-3 border-b border-[var(--color-surface-container-high)] hover:bg-[var(--color-surface-container-low)] cursor-pointer transition-colors"
-            style={{ height: ROW_H }}
-            onClick={() => onTaskClick(task)}
+            style={{ position: "sticky", left: 0, zIndex: 30, width: LABEL_W, minWidth: LABEL_W, background: surfaceLow, borderRight: border, display: "flex", alignItems: "flex-end", padding: "0 12px 8px" }}
           >
-            <span className="font-mono text-[10px] text-[var(--color-data-mono)] shrink-0 bg-[var(--color-surface-container)] px-1 rounded">
-              {shortId(task.id)}
-            </span>
-            <span className="text-[12px] font-medium text-[var(--color-on-surface)] truncate" title={task.title}>
-              {task.title}
-            </span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-outline)]">Task</span>
           </div>
-        ))}
-
-        {/* No-dates section */}
-        {noDates.length > 0 && (
-          <>
-            <div
-              className="sticky px-3 border-t-2 border-[var(--color-outline-variant)] bg-[var(--color-surface-container-low)] flex items-center"
-              style={{ top: HEADER_H, height: SECTION_H }}
-            >
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-outline)]">
-                Tanpa Tanggal ({noDates.length})
-              </span>
-            </div>
-            {noDates.map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center gap-2 px-3 border-b border-[var(--color-surface-container-high)] hover:bg-[var(--color-surface-container-low)] cursor-pointer transition-colors"
-                style={{ height: ROW_H }}
-                onClick={() => onTaskClick(task)}
-              >
-                <span className="font-mono text-[10px] text-[var(--color-data-mono)] shrink-0">{shortId(task.id)}</span>
-                <span className="text-[12px] text-[var(--color-on-surface-variant)] truncate">{task.title}</span>
-              </div>
-            ))}
-          </>
-        )}
-      </div>
-
-      {/* RIGHT PANEL: chart — horizontal + vertical scroll, both contained in card */}
-      <div
-        ref={rightRef}
-        onScroll={onRightScroll}
-        style={{ flex: 1, overflow: "auto", minWidth: 0 }}
-      >
-        <div style={{ width: totalChartW, minWidth: totalChartW }}>
-
-          {/* Month header — sticky within right panel's scroll container */}
-          <div
-            className="sticky top-0 z-20 flex border-b border-[var(--color-outline-variant)] bg-[var(--color-surface-container-low)]"
-            style={{ height: 28 }}
-          >
-            {months.map((m, i) => (
-              <div
-                key={i}
-                className="flex items-center px-2 border-r border-[var(--color-outline-variant)]"
-                style={{ width: m.count * DAY_W, minWidth: m.count * DAY_W, height: 28 }}
-              >
-                <span className="text-[11px] font-semibold text-[var(--color-on-surface-variant)] truncate">{m.label}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Day header — sticky */}
-          <div
-            className="sticky top-[28px] z-20 flex border-b-2 border-[var(--color-outline-variant)] bg-[var(--color-surface-container-low)]"
-            style={{ height: 24 }}
-          >
-            {days.map((d, i) => {
-              const dStr = d.toISOString().slice(0, 10);
-              const isToday = dStr === TODAY;
-              const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-              const isMonday = d.getDay() === 1;
-              return (
-                <div
-                  key={i}
-                  className={`flex items-center justify-center text-[10px] border-r ${isMonday ? "border-[var(--color-outline-variant)]" : "border-[var(--color-surface-container-high)]"}`}
-                  style={{
-                    width: DAY_W, minWidth: DAY_W, height: 24,
-                    background: isToday ? "var(--color-secondary-container)" : undefined,
-                    color: isToday ? "var(--color-primary)" : isWeekend ? "var(--color-outline-variant)" : "var(--color-outline)",
-                    fontWeight: isToday ? 700 : undefined,
-                  }}
-                >
-                  {d.getDate()}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Task bar rows */}
-          {withDates.map((task) => {
-            const startCol = task.start_date ? dayCol(task.start_date) : (task.due_date ? dayCol(task.due_date) : 0);
-            const endCol = task.due_date ? dayCol(task.due_date) : startCol;
-            const barW = Math.max((endCol - startCol + 1) * DAY_W, DAY_W);
-            const barL = startCol * DAY_W;
-            const s = getStatus(task.status);
-            const overdue = isOverdue(task.due_date, task.status);
+          {days.map((d, i) => {
+            const dStr = d.toISOString().slice(0, 10);
+            const isToday = dStr === TODAY;
+            const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+            const isMonday = d.getDay() === 1;
             return (
               <div
-                key={task.id}
-                className="relative border-b border-[var(--color-surface-container-high)] hover:bg-[var(--color-surface-container-low)] transition-colors"
-                style={{ height: ROW_H }}
+                key={i}
+                className={`flex items-center justify-center text-[10px] border-r ${isMonday ? "border-[var(--color-outline-variant)]" : "border-[var(--color-surface-container-high)]"}`}
+                style={{
+                  width: DAY_W, minWidth: DAY_W, height: 24,
+                  background: isToday ? "var(--color-secondary-container)" : undefined,
+                  color: isToday ? "var(--color-primary)" : isWeekend ? "var(--color-outline-variant)" : "var(--color-outline)",
+                  fontWeight: isToday ? 700 : undefined,
+                }}
               >
+                {d.getDate()}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* TASK ROWS — tasks with dates */}
+        {withDates.map((task) => {
+          const startCol = task.start_date ? dayCol(task.start_date) : (task.due_date ? dayCol(task.due_date) : 0);
+          const endCol = task.due_date ? dayCol(task.due_date) : startCol;
+          const barW = Math.max((endCol - startCol + 1) * DAY_W, DAY_W);
+          const barL = startCol * DAY_W;
+          const s = getStatus(task.status);
+          const overdue = isOverdue(task.due_date, task.status);
+          return (
+            <div
+              key={task.id}
+              className="group flex border-b border-[var(--color-surface-container-high)] hover:bg-[var(--color-surface-container-low)] transition-colors"
+              style={{ height: ROW_H }}
+            >
+              {/* Label cell — sticky left, background matches row hover via group-hover */}
+              <div
+                className="bg-white group-hover:bg-[var(--color-surface-container-low)] transition-colors flex items-center gap-2 cursor-pointer shrink-0"
+                style={{ position: "sticky", left: 0, zIndex: 25, width: LABEL_W, minWidth: LABEL_W, borderRight: border, padding: "0 12px" }}
+                onClick={() => onTaskClick(task)}
+              >
+                <span className="font-mono text-[10px] text-[var(--color-data-mono)] shrink-0 bg-[var(--color-surface-container)] px-1 rounded">
+                  {shortId(task.id)}
+                </span>
+                <span className="text-[12px] font-medium text-[var(--color-on-surface)] truncate" title={task.title}>
+                  {task.title}
+                </span>
+              </div>
+              {/* Chart cell — task bars positioned absolutely within this relative container */}
+              <div style={{ position: "relative", width: totalChartW, minWidth: totalChartW, height: ROW_H }}>
                 {days.map((d, i) =>
                   (d.getDay() === 0 || d.getDay() === 6) ? (
                     <div
                       key={i}
                       className="absolute top-0 bottom-0 pointer-events-none"
-                      style={{ left: i * DAY_W, width: DAY_W, background: "var(--color-surface-container-low)" }}
+                      style={{ left: i * DAY_W, width: DAY_W, background: surfaceLow }}
                     />
                   ) : null
                 )}
@@ -682,41 +622,58 @@ function GanttView({
                 </div>
                 {overdue && (
                   <div
-                    className="absolute rounded-r z-30 pointer-events-none"
+                    className="absolute rounded-r z-20 pointer-events-none"
                     style={{ top: 5, bottom: 5, left: barL + barW, width: 4, background: "var(--color-error)" }}
                   />
                 )}
               </div>
-            );
-          })}
+            </div>
+          );
+        })}
 
-          {/* No-dates placeholder rows */}
-          {noDates.length > 0 && (
-            <>
+        {/* NO-DATES SECTION */}
+        {noDates.length > 0 && (
+          <>
+            {/* Section header — sticky vertically so it doesn't scroll out of view */}
+            <div style={{ position: "sticky", top: HEADER_H, zIndex: 15, display: "flex", height: SECTION_H, borderTop: borderBold, background: surfaceLow }}>
               <div
-                className="border-t-2 border-[var(--color-outline-variant)] bg-[var(--color-surface-container-low)]"
-                style={{ height: SECTION_H }}
-              />
-              {noDates.map((task) => (
+                style={{ position: "sticky", left: 0, zIndex: 20, width: LABEL_W, minWidth: LABEL_W, background: surfaceLow, borderRight: border, display: "flex", alignItems: "center", padding: "0 12px" }}
+              >
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--color-outline)]">
+                  Tanpa Tanggal ({noDates.length})
+                </span>
+              </div>
+              <div style={{ flex: 1 }} />
+            </div>
+            {noDates.map((task) => (
+              <div
+                key={task.id}
+                className="group flex border-b border-[var(--color-surface-container-high)] hover:bg-[var(--color-surface-container-low)] transition-colors cursor-pointer"
+                style={{ height: ROW_H }}
+                onClick={() => onTaskClick(task)}
+              >
                 <div
-                  key={task.id}
-                  className="relative border-b border-[var(--color-surface-container-high)]"
-                  style={{ height: ROW_H }}
+                  className="bg-white group-hover:bg-[var(--color-surface-container-low)] transition-colors flex items-center gap-2 shrink-0"
+                  style={{ position: "sticky", left: 0, zIndex: 25, width: LABEL_W, minWidth: LABEL_W, borderRight: border, padding: "0 12px" }}
                 >
+                  <span className="font-mono text-[10px] text-[var(--color-data-mono)] shrink-0">{shortId(task.id)}</span>
+                  <span className="text-[12px] text-[var(--color-on-surface-variant)] truncate">{task.title}</span>
+                </div>
+                <div style={{ position: "relative", width: totalChartW, minWidth: totalChartW, height: ROW_H }}>
                   {days.map((d, i) =>
                     (d.getDay() === 0 || d.getDay() === 6) ? (
                       <div
                         key={i}
                         className="absolute top-0 bottom-0 pointer-events-none"
-                        style={{ left: i * DAY_W, width: DAY_W, background: "var(--color-surface-container-low)" }}
+                        style={{ left: i * DAY_W, width: DAY_W, background: surfaceLow }}
                       />
                     ) : null
                   )}
                 </div>
-              ))}
-            </>
-          )}
-        </div>
+              </div>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );
