@@ -4,6 +4,14 @@ import { Badge } from "@metland/ui";
 import { HealthMeter } from "@metland/ui";
 import Link from "next/link";
 import { getDb } from "@/lib/turso";
+import {
+  TaskPriorityDonut,
+  ProjectStatusBar,
+  TaskActivityLine,
+  type PriorityItem,
+  type ProjectStatusItem,
+  type DailyActivity,
+} from "./charts";
 
 export const dynamic = "force-dynamic";
 
@@ -29,9 +37,53 @@ async function getKpi() {
       .then(r => Object.fromEntries((r.rows as unknown as { status: string; cnt: number }[]).map(x => [x.status, Number(x.cnt)])))
       .catch(() => ({} as Record<string, number>));
     const board = BOARD.map(b => ({ ...b, count: byStatus[b.status] ?? 0 }));
-    return { total, active, delayed, atRisk, overdueTasks, upcoming, board, taskTotal: board.reduce((s, b) => s + b.count, 0) };
+
+    // Chart data
+    const PRIORITY_COLORS: Record<string, string> = {
+      CRITICAL: "#ef4444", HIGH: "#f97316", MEDIUM: "#3b82f6", LOW: "#94a3b8",
+    };
+    const priorityRows = await db.execute("SELECT priority, COUNT(*) as cnt FROM tasks GROUP BY priority")
+      .then(r => r.rows as unknown as { priority: string; cnt: number }[])
+      .catch(() => [] as { priority: string; cnt: number }[]);
+    const priorityData: PriorityItem[] = ["CRITICAL", "HIGH", "MEDIUM", "LOW"].map((p) => ({
+      name: p.charAt(0) + p.slice(1).toLowerCase(),
+      value: Number(priorityRows.find(r => r.priority === p)?.cnt ?? 0),
+      fill: PRIORITY_COLORS[p],
+    }));
+
+    const projectStatusRows = await db.execute(
+      "SELECT status, COUNT(*) as cnt FROM projects GROUP BY status ORDER BY cnt DESC"
+    )
+      .then(r => r.rows as unknown as { status: string; cnt: number }[])
+      .catch(() => [] as { status: string; cnt: number }[]);
+    const projectStatusData: ProjectStatusItem[] = projectStatusRows.map(r => ({
+      status: String(r.status),
+      count: Number(r.cnt),
+    }));
+
+    const activityRows = await db.execute(
+      "SELECT date(created_at) as day, COUNT(*) as cnt FROM tasks WHERE date(created_at) >= date('now','-30 days') GROUP BY date(created_at) ORDER BY day ASC"
+    )
+      .then(r => r.rows as unknown as { day: string; cnt: number }[])
+      .catch(() => [] as { day: string; cnt: number }[]);
+    const activityData: DailyActivity[] = activityRows.map(r => ({
+      day: String(r.day),
+      tasks: Number(r.cnt),
+    }));
+
+    return {
+      total, active, delayed, atRisk, overdueTasks, upcoming, board,
+      taskTotal: board.reduce((s, b) => s + b.count, 0),
+      priorityData, projectStatusData, activityData,
+    };
   } catch {
-    return { total: 0, active: 0, delayed: 0, atRisk: 0, overdueTasks: 0, upcoming: 0, board: BOARD.map(b => ({ ...b, count: 0 })), taskTotal: 0 };
+    return {
+      total: 0, active: 0, delayed: 0, atRisk: 0, overdueTasks: 0, upcoming: 0,
+      board: BOARD.map(b => ({ ...b, count: 0 })), taskTotal: 0,
+      priorityData: [] as PriorityItem[],
+      projectStatusData: [] as ProjectStatusItem[],
+      activityData: [] as DailyActivity[],
+    };
   }
 }
 
@@ -86,6 +138,13 @@ export default async function Dashboard() {
             ))}
           </CardContent>
         </Card>
+      </div>
+
+      {/* Charts row */}
+      <div className="grid lg:grid-cols-3 gap-4">
+        <TaskPriorityDonut data={kpi.priorityData} />
+        <ProjectStatusBar data={kpi.projectStatusData} />
+        <TaskActivityLine data={kpi.activityData} />
       </div>
     </div>
   );
