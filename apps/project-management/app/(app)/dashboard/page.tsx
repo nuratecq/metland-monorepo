@@ -24,49 +24,59 @@ const BOARD = [
   { status: "DONE", label: "Done", bar: "bg-emerald-500" },
 ] as const;
 
+const PRIORITY_COLORS: Record<string, string> = {
+  CRITICAL: "#ef4444", HIGH: "#f97316", MEDIUM: "#3b82f6", LOW: "#94a3b8",
+};
+
 async function getKpi() {
   try {
     const db = getDb();
-    const total = await db.execute("SELECT COUNT(*) as cnt FROM projects").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt));
-    const active = await db.execute("SELECT COUNT(*) as cnt FROM projects WHERE status='ACTIVE'").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt));
-    const delayed = await db.execute("SELECT COUNT(*) as cnt FROM projects WHERE health_status='RED'").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt));
-    const atRisk = await db.execute("SELECT COUNT(*) as cnt FROM projects WHERE health_status='YELLOW'").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt));
-    const overdueTasks = await db.execute("SELECT COUNT(*) as cnt FROM tasks WHERE due_date < date('now') AND status != 'DONE'").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt)).catch(() => 0);
-    const upcoming = await db.execute("SELECT COUNT(*) as cnt FROM milestones WHERE due_date BETWEEN date('now') AND date('now','+14 days')").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt)).catch(() => 0);
-    const byStatus = await db.execute("SELECT status, COUNT(*) as cnt FROM tasks GROUP BY status")
-      .then(r => Object.fromEntries((r.rows as unknown as { status: string; cnt: number }[]).map(x => [x.status, Number(x.cnt)])))
-      .catch(() => ({} as Record<string, number>));
+
+    // 8 sequential queries → 5 parallel, project KPIs batched into 1 SQL
+    const [projectKpi, overdueTasks, upcoming, byStatusRs, priorityRs, projectStatusRs, activityRs] =
+      await Promise.all([
+        db.execute(`
+          SELECT
+            COUNT(*) as total,
+            COUNT(CASE WHEN status='ACTIVE' THEN 1 END) as active,
+            COUNT(CASE WHEN health_status='RED' THEN 1 END) as delayed,
+            COUNT(CASE WHEN health_status='YELLOW' THEN 1 END) as at_risk
+          FROM projects
+        `).then(r => r.rows[0] as unknown as Record<string, number>),
+        db.execute("SELECT COUNT(*) as cnt FROM tasks WHERE due_date < date('now') AND status != 'DONE'")
+          .then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt)).catch(() => 0),
+        db.execute("SELECT COUNT(*) as cnt FROM milestones WHERE due_date BETWEEN date('now') AND date('now','+14 days')")
+          .then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt)).catch(() => 0),
+        db.execute("SELECT status, COUNT(*) as cnt FROM tasks GROUP BY status")
+          .then(r => r.rows as unknown as { status: string; cnt: number }[]).catch(() => []),
+        db.execute("SELECT priority, COUNT(*) as cnt FROM tasks GROUP BY priority")
+          .then(r => r.rows as unknown as { priority: string; cnt: number }[]).catch(() => []),
+        db.execute("SELECT status, COUNT(*) as cnt FROM projects GROUP BY status ORDER BY cnt DESC")
+          .then(r => r.rows as unknown as { status: string; cnt: number }[]).catch(() => []),
+        db.execute("SELECT date(created_at) as day, COUNT(*) as cnt FROM tasks WHERE date(created_at) >= date('now','-30 days') GROUP BY date(created_at) ORDER BY day ASC")
+          .then(r => r.rows as unknown as { day: string; cnt: number }[]).catch(() => []),
+      ]);
+
+    const total = Number(projectKpi.total ?? 0);
+    const active = Number(projectKpi.active ?? 0);
+    const delayed = Number(projectKpi.delayed ?? 0);
+    const atRisk = Number(projectKpi.at_risk ?? 0);
+
+    const byStatus = Object.fromEntries(byStatusRs.map(x => [x.status, Number(x.cnt)]));
     const board = BOARD.map(b => ({ ...b, count: byStatus[b.status] ?? 0 }));
 
-    // Chart data
-    const PRIORITY_COLORS: Record<string, string> = {
-      CRITICAL: "#ef4444", HIGH: "#f97316", MEDIUM: "#3b82f6", LOW: "#94a3b8",
-    };
-    const priorityRows = await db.execute("SELECT priority, COUNT(*) as cnt FROM tasks GROUP BY priority")
-      .then(r => r.rows as unknown as { priority: string; cnt: number }[])
-      .catch(() => [] as { priority: string; cnt: number }[]);
     const priorityData: PriorityItem[] = ["CRITICAL", "HIGH", "MEDIUM", "LOW"].map((p) => ({
       name: p.charAt(0) + p.slice(1).toLowerCase(),
-      value: Number(priorityRows.find(r => r.priority === p)?.cnt ?? 0),
+      value: Number(priorityRs.find(r => r.priority === p)?.cnt ?? 0),
       fill: PRIORITY_COLORS[p],
     }));
 
-    const projectStatusRows = await db.execute(
-      "SELECT status, COUNT(*) as cnt FROM projects GROUP BY status ORDER BY cnt DESC"
-    )
-      .then(r => r.rows as unknown as { status: string; cnt: number }[])
-      .catch(() => [] as { status: string; cnt: number }[]);
-    const projectStatusData: ProjectStatusItem[] = projectStatusRows.map(r => ({
+    const projectStatusData: ProjectStatusItem[] = projectStatusRs.map(r => ({
       status: String(r.status),
       count: Number(r.cnt),
     }));
 
-    const activityRows = await db.execute(
-      "SELECT date(created_at) as day, COUNT(*) as cnt FROM tasks WHERE date(created_at) >= date('now','-30 days') GROUP BY date(created_at) ORDER BY day ASC"
-    )
-      .then(r => r.rows as unknown as { day: string; cnt: number }[])
-      .catch(() => [] as { day: string; cnt: number }[]);
-    const activityData: DailyActivity[] = activityRows.map(r => ({
+    const activityData: DailyActivity[] = activityRs.map(r => ({
       day: String(r.day),
       tasks: Number(r.cnt),
     }));
@@ -97,8 +107,12 @@ export default async function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiTile label="Total Projects" value={kpi.total} sub={`${kpi.active} active`} />
-        <KpiTile label="Delayed" value={kpi.delayed} sub="health RED" />
+        <Link href="/projects" className="block">
+          <KpiTile label="Total Projects" value={kpi.total} sub={`${kpi.active} active`} className="cursor-pointer hover:bg-[var(--color-surface-container-low)] transition-colors" />
+        </Link>
+        <Link href="/projects/my" className="block">
+          <KpiTile label="Delayed" value={kpi.delayed} sub="health RED" className="cursor-pointer hover:bg-[var(--color-surface-container-low)] transition-colors" />
+        </Link>
         <KpiTile label="At Risk" value={kpi.atRisk} sub="health YELLOW" />
         <KpiTile label="Overdue Tasks" value={kpi.overdueTasks} />
         <KpiTile label="Upcoming Milestones (14d)" value={kpi.upcoming} />
