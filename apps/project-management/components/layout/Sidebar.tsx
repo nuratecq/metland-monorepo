@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderKanban, FolderHeart, Archive, CalendarDays, Files, BarChart3, Bell, ShieldCheck, Bot } from "lucide-react";
+import { LayoutDashboard, FolderKanban, FolderHeart, Archive, CalendarDays, Files, BarChart3, Bell, ShieldCheck, Bot, Users } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 
 const nav = [
@@ -12,6 +12,7 @@ const nav = [
   { href: "/projects/my", label: "My Projects", icon: FolderHeart },
   { href: "/projects/archive", label: "Project Archive", icon: Archive },
   { href: "/schedule", label: "Schedule", icon: CalendarDays },
+  { href: "/employees", label: "Employees", icon: Users },
   { href: "/documents", label: "Documents", icon: Files },
   { href: "/reports", label: "Reports", icon: BarChart3 },
   { href: "/notifications", label: "Notifications", icon: Bell },
