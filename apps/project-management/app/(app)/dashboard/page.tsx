@@ -107,8 +107,12 @@ export default async function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiTile label="Total Projects" value={kpi.total} sub={`${kpi.active} active`} />
-        <KpiTile label="Delayed" value={kpi.delayed} sub="health RED" />
+        <Link href="/projects" className="block">
+          <KpiTile label="Total Projects" value={kpi.total} sub={`${kpi.active} active`} className="cursor-pointer hover:bg-[var(--color-surface-container-low)] transition-colors" />
+        </Link>
+        <Link href="/projects/my" className="block">
+          <KpiTile label="Delayed" value={kpi.delayed} sub="health RED" className="cursor-pointer hover:bg-[var(--color-surface-container-low)] transition-colors" />
+        </Link>
         <KpiTile label="At Risk" value={kpi.atRisk} sub="health YELLOW" />
         <KpiTile label="Overdue Tasks" value={kpi.overdueTasks} />
         <KpiTile label="Upcoming Milestones (14d)" value={kpi.upcoming} />
