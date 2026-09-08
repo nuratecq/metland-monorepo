@@ -18,7 +18,17 @@ async function getData(q: string, status: string, sort: string) {
       : sort === "deadline" ? " ORDER BY p.planned_end_date ASC"
       : " ORDER BY p.progress DESC";
     sql += " LIMIT 100";
-    const rs = await db.execute({ sql, args: args as never[] });
+    const [rs, kpiRs] = await Promise.all([
+      db.execute({ sql, args: args as never[] }),
+      db.execute(`
+        SELECT
+          COUNT(*) as total,
+          COUNT(CASE WHEN health_status='GREEN' THEN 1 END) as on_track,
+          COUNT(CASE WHEN health_status='YELLOW' THEN 1 END) as at_risk,
+          COUNT(CASE WHEN health_status='RED' THEN 1 END) as delayed
+        FROM projects
+      `),
+    ]);
     const rows: ProjectRow[] = (rs.rows as unknown as Record<string, unknown>[]).map((r) => ({
       id: String(r.id ?? ""),
       project_code: String(r.project_code ?? ""),
@@ -30,12 +40,12 @@ async function getData(q: string, status: string, sort: string) {
       planned_end_date: r.planned_end_date != null ? String(r.planned_end_date) : null,
       manager_name: r.manager_name != null ? String(r.manager_name) : null,
     }));
-
+    const [kpiRow] = kpiRs.rows as unknown as Record<string, number>[];
     const kpi = {
-      total: await db.execute("SELECT COUNT(*) as cnt FROM projects").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt)),
-      onTrack: await db.execute("SELECT COUNT(*) as cnt FROM projects WHERE health_status='GREEN'").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt)),
-      atRisk: await db.execute("SELECT COUNT(*) as cnt FROM projects WHERE health_status='YELLOW'").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt)),
-      delayed: await db.execute("SELECT COUNT(*) as cnt FROM projects WHERE health_status='RED'").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt)),
+      total: Number(kpiRow?.total ?? 0),
+      onTrack: Number(kpiRow?.on_track ?? 0),
+      atRisk: Number(kpiRow?.at_risk ?? 0),
+      delayed: Number(kpiRow?.delayed ?? 0),
     };
     return { rows, kpi };
   } catch {
