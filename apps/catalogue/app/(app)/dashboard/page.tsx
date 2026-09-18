@@ -24,7 +24,7 @@ export default function Dashboard() {
       <Card>
         <CardHeader className="flex items-center justify-between">
           <span className="font-semibold">AI Search</span>
-          <Badge status="info">Phase 4</Badge>
+          <Badge variant="info">Phase 4</Badge>
         </CardHeader>
         <CardContent className="text-sm text-[var(--color-on-surface-variant)]">
           Contoh: “Cari kontraktor struktur untuk proyek high rise” — pipeline Intent → Retrieval → Ranking → Explanation (guardrail anti-halusinasi).
