@@ -7,6 +7,7 @@ import { buildProjectInsight } from "@/lib/insight";
 import { HEALTH_STYLE, PROJECT_STATUS_LABEL, SEVERITY_STYLE, DOC_STATUS_STYLE } from "@/lib/status-styles";
 import { CheckSquare, FileText, AlertTriangle, CalendarClock, TrendingUp, Sparkles } from "lucide-react";
 import { MilestoneChart } from "@/components/projects/MilestoneChart";
+import { PhaseProgress } from "@/components/projects/PhaseProgress";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -55,6 +56,75 @@ export default async function ProjectDetail({
     .catch(() => [] as Milestone[]);
 
   const today = new Date().toISOString().slice(0, 10);
+
+  const phaseTasks = await db
+    .execute({
+      sql: "SELECT id, title, status, milestone_id FROM tasks WHERE project_id = ? AND milestone_id IS NOT NULL ORDER BY created_at ASC",
+      args: [id],
+    })
+    .then((r) => r.rows.map((row) => {
+      const t = row as unknown as Record<string, unknown>;
+      return {
+        id: String(t.id ?? ""),
+        title: String(t.title ?? ""),
+        status: String(t.status ?? "TODO"),
+        milestone_id: String(t.milestone_id ?? ""),
+      };
+    }))
+    .catch(() => [] as { id: string; title: string; status: string; milestone_id: string }[]);
+
+  // 4 fixed pipeline stages — names & docs always the same, status/tasks from DB by index
+  const PIPELINE_STAGES = [
+    {
+      name: "Feasibility Study",
+      docs: ["Submit Data Finance", "Submit Data Marketing", "Submit Data Siteplan"],
+    },
+    {
+      name: "Quantity Surveyor",
+      docs: ["Submit Progress Tender", "Submit Schedule", "Submit Material", "Submit Dokumen Kerja"],
+    },
+    {
+      name: "Design Plan",
+      docs: ["Submit Progress Tender", "Submit Schedule", "Submit Material", "Submit Gambar", "Submit Dokumen"],
+    },
+    {
+      name: "Construction",
+      docs: ["Submit Schedule", "Submit Progress Kerja", "Submit Materials", "Submit Dokumen Kerja"],
+    },
+  ];
+
+  function docStatusForPhase(phaseStatus: string, docIdx: number): string {
+    if (phaseStatus === "DONE") return "APPROVED";
+    if (phaseStatus === "IN_PROGRESS") return docIdx < 2 ? "APPROVED" : "DRAFT";
+    if (phaseStatus === "BLOCKED") return docIdx === 2 ? "REJECTED" : "DRAFT";
+    return "DRAFT";
+  }
+
+  const tasksByMilestone = new Map<string, typeof phaseTasks>();
+  for (const t of phaseTasks) {
+    const arr = tasksByMilestone.get(t.milestone_id) ?? [];
+    arr.push(t);
+    tasksByMilestone.set(t.milestone_id, arr);
+  }
+  const phases = PIPELINE_STAGES.map((stage, stageIdx) => {
+    const m = milestones[stageIdx];
+    const phaseStatus = m?.status ?? "TODO";
+    const phaseId = m?.id ?? `stage-${stageIdx}`;
+    return {
+      id: phaseId,
+      name: stage.name,
+      status: phaseStatus,
+      completion_percentage: m?.completion_percentage ?? 0,
+      due_date: m?.due_date ?? null,
+      tasks: m ? (tasksByMilestone.get(m.id) ?? []).map(({ milestone_id: _, ...rest }) => rest) : [],
+      documents: stage.docs.map((docName, i) => ({
+        id: `${phaseId}-doc-${i}`,
+        file_name: `${docName}.pdf`,
+        category: "Approval" as const,
+        status: docStatusForPhase(phaseStatus, i),
+      })),
+    };
+  });
 
   const overdueTasksRs = await db
     .execute({
@@ -160,6 +230,9 @@ export default async function ProjectDetail({
           </a>
         </div>
       </div>
+
+      {/* Phase progress stepper */}
+      <PhaseProgress phases={phases} />
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
