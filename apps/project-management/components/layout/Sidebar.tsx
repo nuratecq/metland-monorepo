@@ -16,6 +16,7 @@ const nav = [
   { href: "/projects/my", label: "My Projects", icon: FolderHeart },
   { href: "/projects/archive", label: "Project Archive", icon: Archive },
   { href: "/schedule", label: "Schedule", icon: CalendarDays },
+  { href: "/employees", label: "Employees", icon: Users },
   { href: "/documents", label: "Documents", icon: Files },
   { href: "/reports", label: "Reports", icon: BarChart3 },
   { href: "/notifications", label: "Notifications", icon: Bell },

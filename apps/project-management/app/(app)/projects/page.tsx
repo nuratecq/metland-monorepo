@@ -1,22 +1,10 @@
 import { getDb } from "@/lib/turso";
-import { KpiTile, Table, Th, Td } from "@metland/ui";
+import { KpiTile } from "@metland/ui";
 import Link from "next/link";
 import { ProjectFilters } from "@/components/projects/ProjectFilters";
-import { HEALTH_STYLE, PROJECT_STATUS_LABEL } from "@/lib/status-styles";
+import { ProjectViewToggle, type ProjectRow } from "@/components/projects/ProjectViewToggle";
 
 export const dynamic = "force-dynamic";
-
-type Row = {
-  id: string;
-  project_code: string;
-  name: string;
-  location_text: string | null;
-  progress: number;
-  status: string;
-  health_status: "GREEN" | "YELLOW" | "RED";
-  planned_end_date: string | null;
-  manager_name: string | null;
-};
 
 async function getData(q: string, status: string, sort: string) {
   try {
@@ -30,18 +18,38 @@ async function getData(q: string, status: string, sort: string) {
       : sort === "deadline" ? " ORDER BY p.planned_end_date ASC"
       : " ORDER BY p.progress DESC";
     sql += " LIMIT 100";
-    const rs = await db.execute({ sql, args: args as never[] });
-    const rows = rs.rows as unknown as Row[];
-
+    const [rs, kpiRs] = await Promise.all([
+      db.execute({ sql, args: args as never[] }),
+      db.execute(`
+        SELECT
+          COUNT(*) as total,
+          COUNT(CASE WHEN health_status='GREEN' THEN 1 END) as on_track,
+          COUNT(CASE WHEN health_status='YELLOW' THEN 1 END) as at_risk,
+          COUNT(CASE WHEN health_status='RED' THEN 1 END) as delayed
+        FROM projects
+      `),
+    ]);
+    const rows: ProjectRow[] = (rs.rows as unknown as Record<string, unknown>[]).map((r) => ({
+      id: String(r.id ?? ""),
+      project_code: String(r.project_code ?? ""),
+      name: String(r.name ?? ""),
+      location_text: r.location_text != null ? String(r.location_text) : null,
+      progress: Number(r.progress ?? 0),
+      status: String(r.status ?? ""),
+      health_status: String(r.health_status ?? "GREEN"),
+      planned_end_date: r.planned_end_date != null ? String(r.planned_end_date) : null,
+      manager_name: r.manager_name != null ? String(r.manager_name) : null,
+    }));
+    const [kpiRow] = kpiRs.rows as unknown as Record<string, number>[];
     const kpi = {
-      total: await db.execute("SELECT COUNT(*) as cnt FROM projects").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt)),
-      onTrack: await db.execute("SELECT COUNT(*) as cnt FROM projects WHERE health_status='GREEN'").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt)),
-      atRisk: await db.execute("SELECT COUNT(*) as cnt FROM projects WHERE health_status='YELLOW'").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt)),
-      delayed: await db.execute("SELECT COUNT(*) as cnt FROM projects WHERE health_status='RED'").then(r => Number((r.rows[0] as unknown as Record<string, number>).cnt)),
+      total: Number(kpiRow?.total ?? 0),
+      onTrack: Number(kpiRow?.on_track ?? 0),
+      atRisk: Number(kpiRow?.at_risk ?? 0),
+      delayed: Number(kpiRow?.delayed ?? 0),
     };
     return { rows, kpi };
   } catch {
-    return { rows: [] as Row[], kpi: { total: 0, onTrack: 0, atRisk: 0, delayed: 0 } };
+    return { rows: [] as ProjectRow[], kpi: { total: 0, onTrack: 0, atRisk: 0, delayed: 0 } };
   }
 }
 
@@ -73,54 +81,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
 
       <div className="bg-white border border-[var(--color-outline-variant)] rounded">
         <ProjectFilters q={q} status={status} sort={sort} />
-        <Table>
-          <thead>
-            <tr>
-              <Th>ID</Th>
-              <Th>Proyek</Th>
-              <Th>Lokasi</Th>
-              <Th>Progres</Th>
-              <Th>Status</Th>
-              <Th>PM</Th>
-              <Th>Tenggat</Th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.length === 0 ? (
-              <tr><Td colSpan={7} className="text-center py-10 text-[var(--color-on-surface-variant)]">Tidak ada proyek yang cocok dengan filter ini.</Td></tr>
-            ) : (
-              rows.map((p) => {
-                const h = HEALTH_STYLE[p.health_status] ?? HEALTH_STYLE.GREEN;
-                return (
-                  <tr key={p.id} className="hover:bg-[var(--color-surface-container-low)] cursor-pointer">
-                    <Td>
-                      <Link href={`/projects/${p.id}`} className="font-mono text-[13px] text-[var(--color-data-mono)]">{p.project_code}</Link>
-                    </Td>
-                    <Td>
-                      <Link href={`/projects/${p.id}`} className="font-medium text-[var(--color-on-surface)]">{p.name}</Link>
-                    </Td>
-                    <Td className="text-[var(--color-on-surface-variant)]">{p.location_text ?? "—"}</Td>
-                    <Td>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-1.5 rounded-full bg-[var(--color-surface-container-high)] overflow-hidden min-w-[64px]">
-                          <div className="h-full rounded-full" style={{ width: `${p.progress}%`, background: h.color }} />
-                        </div>
-                        <span className="font-mono text-[13px] text-[var(--color-on-surface-variant)]">{p.progress}%</span>
-                      </div>
-                    </Td>
-                    <Td>
-                      <span className="h-[22px] px-2 inline-flex items-center rounded text-xs font-semibold tracking-wide uppercase" style={{ background: h.bg, color: h.color }}>
-                        {PROJECT_STATUS_LABEL[p.status] ?? p.status}
-                      </span>
-                    </Td>
-                    <Td className="text-[var(--color-on-surface-variant)]">{p.manager_name ?? "—"}</Td>
-                    <Td className="font-mono text-[13px] text-[var(--color-on-surface-variant)]">{p.planned_end_date ?? "—"}</Td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </Table>
+        <ProjectViewToggle rows={rows} />
       </div>
     </div>
   );

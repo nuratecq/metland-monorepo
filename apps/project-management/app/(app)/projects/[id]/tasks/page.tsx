@@ -42,13 +42,27 @@ export default async function ProjectTasksPage({
       : Promise.resolve([] as string[]),
   ]);
 
-  const project = projectRs.rows[0] as unknown as
-    | { id: string; name: string; project_code: string }
-    | undefined;
-  if (!project) return notFound();
+  const rawProject = projectRs.rows[0] as Record<string, unknown> | undefined;
+  if (!rawProject) return notFound();
+  const project = { id: String(rawProject.id), name: String(rawProject.name), project_code: String(rawProject.project_code) };
 
-  const tasks = tasksRs.rows as unknown as TaskItem[];
-  const users = usersRs.rows as unknown as { id: string; name: string }[];
+  const tasks: TaskItem[] = (tasksRs.rows as Record<string, unknown>[]).map((r) => ({
+    id: String(r.id ?? ""),
+    title: String(r.title ?? ""),
+    status: String(r.status ?? "TODO"),
+    priority: String(r.priority ?? "MEDIUM"),
+    start_date: r.start_date != null ? String(r.start_date) : null,
+    due_date: r.due_date != null ? String(r.due_date) : null,
+    progress: Number(r.progress ?? 0),
+    assignee_id: r.assignee_id != null ? String(r.assignee_id) : null,
+    assignee_name: r.assignee_name != null ? String(r.assignee_name) : null,
+    created_at: String(r.created_at ?? ""),
+    updated_at: String(r.updated_at ?? ""),
+  }));
+  const users = (usersRs.rows as Record<string, unknown>[]).map((r) => ({
+    id: String(r.id ?? ""),
+    name: String(r.name ?? ""),
+  }));
 
   const canEdit = perms.includes("*") || perms.includes("task.update");
   const canCreate = perms.includes("*") || perms.includes("task.create");
