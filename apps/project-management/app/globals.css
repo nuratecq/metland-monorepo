@@ -14,9 +14,16 @@ body {
   background: var(--color-background);
   color: var(--color-on-surface);
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-hanken), sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Nav labels, badges, button text — Hanken for UI chrome */
+nav, button, [role="tab"], label, th {
   font-family: var(--font-hanken), sans-serif;
 }
 

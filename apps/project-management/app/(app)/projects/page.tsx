@@ -58,6 +58,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
   const q = sp.q ?? "";
   const status = sp.status ?? "";
   const sort = sp.sort ?? "progress";
+  const view = sp.view === "grid" ? "grid" : "list";
   const { rows, kpi } = await getData(q, status, sort);
 
   return (
@@ -79,9 +80,9 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
         <KpiTile label="Delayed" value={kpi.delayed} className="border-l-4 border-l-[var(--color-status-red)]" />
       </div>
 
-      <div className="bg-white border border-[var(--color-outline-variant)] rounded">
-        <ProjectFilters q={q} status={status} sort={sort} />
-        <ProjectViewToggle rows={rows} />
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <ProjectFilters q={q} status={status} sort={sort} view={view} />
+        <ProjectViewToggle rows={rows} view={view} />
       </div>
     </div>
   );

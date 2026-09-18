@@ -10,7 +10,9 @@
   },
   "scripts": {
     "seed": "tsx src/seed.ts",
-    "seed:demo": "tsx src/seed-demo.ts"
+    "seed:demo": "tsx src/seed-demo.ts",
+    "seed:notifications": "tsx src/seed-notifications.ts",
+    "seed:phase-docs": "tsx src/seed-phase-docs.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.15.0",

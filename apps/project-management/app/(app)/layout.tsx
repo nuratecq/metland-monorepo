@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { getPermissionsForUser } from "@metland/auth";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { Topbar } from "@/components/layout/Topbar";
 import { getSession } from "@/lib/auth";
 import { getDb } from "@/lib/turso";
 
@@ -10,8 +9,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!session) redirect("/login");
 
   const db = getDb();
-  // Role label and admin links both come from the DB — the label was hardcoded
-  // "Project Manager" before, which is wrong for every other account.
   const [perms, roleName] = await Promise.all([
     getPermissionsForUser(db as never, session.userId).catch(() => [] as string[]),
     db
@@ -24,12 +21,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   ]);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-[var(--color-surface)]">
       <Sidebar user={{ name: session.name, role: roleName }} perms={perms} />
-      <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
-        <Topbar user={{ name: session.name }} />
-        <main className="flex-1 p-6 bg-[var(--color-surface)] overflow-y-auto overflow-x-hidden">{children}</main>
-      </div>
+      <main className="flex-1 p-6 bg-[var(--color-surface)] overflow-y-auto overflow-x-hidden min-w-0">{children}</main>
     </div>
   );
 }

@@ -1,9 +1,13 @@
 import { getDb } from "@/lib/turso";
 import { ProjectViewToggle, type ProjectRow } from "@/components/projects/ProjectViewToggle";
+import Link from "next/link";
+import { LayoutList, LayoutGrid } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-export default async function MyProjectsPage() {
+export default async function MyProjectsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+  const sp = await searchParams;
+  const view = sp.view === "grid" ? "grid" : "list";
   const db = getDb();
   let rows: ProjectRow[] = [];
   try {
@@ -31,15 +35,41 @@ export default async function MyProjectsPage() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-hanken)" }}>My Projects</h1>
-        <p className="text-sm text-[var(--color-on-surface-variant)]">
-          {rows.length} proyek aktif atau direncanakan.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-hanken)" }}>My Projects</h1>
+          <p className="text-sm text-[var(--color-on-surface-variant)]">
+            {rows.length} proyek aktif atau direncanakan.
+          </p>
+        </div>
+        <div className="flex items-center gap-1 rounded border border-[var(--color-outline-variant)] p-0.5">
+          <Link
+            href="/projects/my"
+            title="List view"
+            className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${
+              view !== "grid"
+                ? "bg-[var(--color-surface-container-high)] text-[var(--color-on-surface)]"
+                : "text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container)]"
+            }`}
+          >
+            <LayoutList size={14} />
+          </Link>
+          <Link
+            href="/projects/my?view=grid"
+            title="Grid view"
+            className={`w-7 h-7 flex items-center justify-center rounded transition-colors ${
+              view === "grid"
+                ? "bg-[var(--color-surface-container-high)] text-[var(--color-on-surface)]"
+                : "text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container)]"
+            }`}
+          >
+            <LayoutGrid size={14} />
+          </Link>
+        </div>
       </div>
 
-      <div className="bg-white border border-[var(--color-outline-variant)] rounded">
-        <ProjectViewToggle rows={rows} />
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <ProjectViewToggle rows={rows} view={view} />
       </div>
     </div>
   );
