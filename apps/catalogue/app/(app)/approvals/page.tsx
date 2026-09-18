@@ -51,7 +51,7 @@ export default async function ApprovalsPage() {
                     <Td>{String(a.requester_name ?? a.requester_id ?? "—")}</Td>
                     <Td className="whitespace-nowrap">{String(a.created_at ?? "").slice(0, 10)}</Td>
                     <Td>
-                      <Badge status={badgeFor(String(a.status))}>{String(a.status)}</Badge>
+                      <Badge variant={badgeFor(String(a.status))}>{String(a.status)}</Badge>
                     </Td>
                   </tr>
                 ))}

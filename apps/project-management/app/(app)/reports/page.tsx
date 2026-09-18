@@ -81,9 +81,15 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
           <Card>
             <CardHeader className="flex items-center justify-between">
               <span className="font-semibold">{String(report.project.name)}</span>
-              <Badge status={report.project.health_status === "RED" ? "critical" : report.project.health_status === "YELLOW" ? "warning" : "success"}>
+              <span
+                className="h-[20px] px-2 inline-flex items-center rounded text-[11px] font-semibold"
+                style={{
+                  background: report.project.health_status === "RED" ? "#fef2f2" : report.project.health_status === "YELLOW" ? "#fffbeb" : "#f0fdf4",
+                  color: report.project.health_status === "RED" ? "#dc2626" : report.project.health_status === "YELLOW" ? "#d97706" : "#16a34a",
+                }}
+              >
                 {String(report.project.health_status)}
-              </Badge>
+              </span>
             </CardHeader>
             <CardContent className="grid gap-3 sm:grid-cols-4">
               <KpiTile label="Progress" value={`${report.project.progress}%`} />

@@ -87,7 +87,7 @@ export function MilestoneChart({ milestones }: { milestones: Milestone[] }) {
           <LabelList
             dataKey="completion_percentage"
             position="right"
-            formatter={(v: number) => `${v}%`}
+            formatter={(v: unknown) => `${Number(v)}%`}
             style={{ fontSize: 11, fontFamily: "monospace", fill: "var(--color-on-surface-variant)" }}
           />
         </Bar>

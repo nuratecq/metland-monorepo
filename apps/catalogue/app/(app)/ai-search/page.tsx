@@ -72,7 +72,7 @@ export default function AISearchPage() {
             <Card key={r.contractor.id} className="border-l-4" style={{ borderLeftColor: r.match==="High" ? "var(--color-status-green)" : r.match==="Medium" ? "var(--color-status-yellow)" : "var(--color-outline-variant)" }}>
               <CardHeader className="flex flex-row items-center justify-between py-3">
                 <span className="font-semibold">{idx+1}. {r.contractor.company_name} <span className="font-mono text-xs text-[var(--color-data-mono)]">{r.contractor.company_code}</span></span>
-                <Badge status={r.match==="High" ? "success" : r.match==="Medium" ? "warning" : "neutral"}>Match: {r.match}</Badge>
+                <Badge variant={r.match==="High" ? "success" : r.match==="Medium" ? "warning" : "neutral"}>Match: {r.match}</Badge>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
                 <div className="text-[var(--color-on-surface-variant)]">{r.contractor.description}</div>
