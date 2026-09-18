@@ -21,9 +21,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   ]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white">
+    <div className="flex h-screen overflow-hidden bg-[var(--color-surface)]">
       <Sidebar user={{ name: session.name, role: roleName }} perms={perms} />
-      <main className="flex-1 p-6 bg-white overflow-y-auto overflow-x-hidden min-w-0">{children}</main>
+      <main className="flex-1 p-6 bg-[var(--color-surface)] overflow-y-auto overflow-x-hidden min-w-0">{children}</main>
     </div>
   );
 }

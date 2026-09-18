@@ -3,7 +3,7 @@ import * as React from "react";
 export function Card({ className = "", ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`bg-white border border-[var(--color-outline-variant)] rounded-[var(--radius-lg)] ${className}`}
+      className={`bg-white rounded-xl shadow-sm ${className}`}
       {...props}
     />
   );

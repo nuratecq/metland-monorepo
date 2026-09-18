@@ -83,18 +83,19 @@ export function Kanban({ tasks: initial, canEdit }: { tasks: KanbanTask[]; canEd
               onDragOver={(e) => { if (canEdit && dragId) { e.preventDefault(); setOver(col.status); } }}
               onDragLeave={() => setOver((o) => (o === col.status ? null : o))}
               onDrop={(e) => { e.preventDefault(); drop(col.status); }}
-              className={`rounded-lg border p-2.5 min-h-[160px] transition-colors ${
+              className={`rounded-xl p-2.5 flex flex-col transition-colors ${
                 over === col.status
-                  ? "border-[var(--color-primary)] bg-[var(--color-secondary-container)]"
-                  : "border-[var(--color-outline-variant)] bg-[var(--color-surface-container-low)]"
+                  ? "bg-[var(--color-secondary-container)] ring-1 ring-[var(--color-primary)]"
+                  : "bg-[var(--color-surface-container-low)]"
               }`}
+              style={{ minHeight: "calc(100svh - 240px)" }}
             >
               <header className="flex items-center justify-between px-1 pb-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-on-surface-variant)]">{col.label}</span>
                 <span className="text-xs text-[var(--color-outline)]">{items.length}</span>
               </header>
 
-              <ul className="space-y-2">
+              <ul className="space-y-2 flex-1">
                 {items.map((t) => (
                   <li
                     key={t.id}

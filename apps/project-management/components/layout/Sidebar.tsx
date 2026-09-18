@@ -61,7 +61,7 @@ export function Sidebar({ user, perms = [] }: { user?: { name: string; role: str
     .toUpperCase();
 
   return (
-    <aside className="w-[248px] shrink-0 bg-[var(--color-surface-container-low)] hidden md:flex flex-col m-2 rounded-xl overflow-hidden">
+    <aside className="w-[248px] shrink-0 bg-[var(--color-surface-container-high)] hidden md:flex flex-col m-2 rounded-xl overflow-hidden">
       {/* Logo */}
       <div className="h-16 flex items-center justify-center gap-2.5 px-4">
         <Image src="/logo.png" alt="Metland" width={96} height={16} priority className="h-[16px] w-auto" />
@@ -78,9 +78,9 @@ export function Sidebar({ user, perms = [] }: { user?: { name: string; role: str
             <Link
               key={n.href}
               href={n.href}
-              className={`flex items-center gap-2.5 h-9 px-2.5 rounded-md text-sm transition-colors duration-150 ${
+              className={`flex items-center gap-2.5 h-9 px-2.5 rounded-md text-sm font-medium transition-colors duration-150 ${
                 active
-                  ? "bg-[var(--color-secondary-container)] text-[var(--color-on-secondary-container)] font-medium"
+                  ? "bg-[var(--color-secondary-container)] text-[var(--color-on-secondary-container)]"
                   : "text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container)] hover:text-[var(--color-on-surface)]"
               }`}
             >
@@ -91,7 +91,7 @@ export function Sidebar({ user, perms = [] }: { user?: { name: string; role: str
         })}
 
         {visibleAdmin.length > 0 && (
-          <div className="pt-3 mt-2 border-t border-[var(--color-outline-variant)]">
+          <div className="pt-3 mt-2 border-t border-transparent">
             <div className="px-2.5 pb-1.5 text-[11px] font-medium text-[var(--color-outline)] tracking-wide">
               Administration
             </div>
@@ -117,7 +117,7 @@ export function Sidebar({ user, perms = [] }: { user?: { name: string; role: str
       </nav>
 
       {/* Report period */}
-      <div className="px-3.5 py-2 border-t border-[var(--color-outline-variant)]">
+      <div className="px-3.5 py-2 border-t border-transparent">
         <p className="text-[11px] text-[var(--color-outline)]">
           <span className="font-medium text-[var(--color-on-surface-variant)]">Periode</span>{" "}
           {reportPeriod()}
@@ -125,7 +125,7 @@ export function Sidebar({ user, perms = [] }: { user?: { name: string; role: str
       </div>
 
       {/* User */}
-      <div className="px-3 py-2.5 border-t border-[var(--color-outline-variant)] flex items-center gap-2.5">
+      <div className="px-3 py-2.5 border-t border-transparent flex items-center gap-2.5">
         <div className="w-7 h-7 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center text-[11px] font-semibold flex-none select-none">
           {initials}
         </div>

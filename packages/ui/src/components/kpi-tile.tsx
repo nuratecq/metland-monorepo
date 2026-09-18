@@ -12,7 +12,7 @@ export function KpiTile({
   className?: string;
 }) {
   return (
-    <div className={`bg-white border border-[var(--color-outline-variant)] rounded-[var(--radius-lg)] p-4 ${className}`}>
+    <div className={`bg-white rounded-xl p-4 shadow-sm ${className}`}>
       <div className="text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">{label}</div>
       <div className="mt-1 text-3xl font-bold tracking-tight text-[var(--color-on-surface)]" style={{ fontFamily: "var(--font-hanken)" }}>
         {value}
