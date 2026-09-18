@@ -3,7 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderKanban, FolderHeart, Archive, CalendarDays, Files, BarChart3, Bell, ShieldCheck, Bot } from "lucide-react";
+import {
+  LayoutDashboard, FolderKanban, FolderHeart, Archive,
+  CalendarDays, Files, BarChart3, Bell, ShieldCheck, Bot,
+  Users, Shield, Activity,
+} from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 
 const nav = [
@@ -19,30 +23,27 @@ const nav = [
   { href: "/ai", label: "AI Assistant", icon: Bot },
 ];
 
-// Hiding a link is cosmetic — each page calls requirePagePerm() for the real
-// check. This just avoids showing links that would bounce back to /dashboard.
 const admin = [
-  { href: "/admin/users", label: "Users", perm: "user.manage" },
-  { href: "/admin/roles", label: "Roles", perm: "user.manage" },
-  { href: "/admin/audit", label: "Audit Trail", perm: "audit.read" },
+  { href: "/admin/users", label: "Users", perm: "user.manage", icon: Users },
+  { href: "/admin/roles", label: "Roles", perm: "user.manage", icon: Shield },
+  { href: "/admin/audit", label: "Audit Trail", perm: "audit.read", icon: Activity },
 ];
 
 function reportPeriod() {
   const now = new Date();
   const first = new Date(now.getFullYear(), now.getMonth(), 1);
   const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  const fmt = (d: Date) => d.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
+  const fmt = (d: Date) => d.toLocaleDateString("id-ID", { day: "2-digit", month: "short" });
   return `${fmt(first)} – ${fmt(last)}`;
 }
 
 export function Sidebar({ user, perms = [] }: { user?: { name: string; role: string }; perms?: string[] }) {
   const pathname = usePathname();
   const visibleAdmin = admin.filter((a) => perms.includes("*") || perms.includes(a.perm));
+
   const isActive = (href: string) => {
     if (href === "/dashboard") return pathname === "/dashboard";
-    // All Projects: hanya exact /projects
     if (href === "/projects") return pathname === "/projects";
-    // My Projects: juga aktif saat di project detail (/projects/[uuid] dan sub-routes)
     if (href === "/projects/my") {
       if (pathname.startsWith("/projects/my")) return true;
       if (["/projects/archive", "/projects/new"].some((s) => pathname.startsWith(s))) return false;
@@ -50,6 +51,7 @@ export function Sidebar({ user, perms = [] }: { user?: { name: string; role: str
     }
     return pathname.startsWith(href);
   };
+
   const initials = (user?.name ?? "PM")
     .split(" ")
     .map((s) => s[0])
@@ -58,61 +60,81 @@ export function Sidebar({ user, perms = [] }: { user?: { name: string; role: str
     .toUpperCase();
 
   return (
-    <aside className="w-[244px] shrink-0 border-r border-[var(--color-outline-variant)] bg-white hidden md:flex flex-col">
-      <div className="h-16 flex items-center gap-2 px-5 border-b border-[var(--color-outline-variant)] font-bold tracking-tight" style={{ fontFamily: "var(--font-hanken)" }}>
-        <Image src="/logo.png" alt="Metland" width={104} height={18} priority className="h-[18px] w-auto" />
-        <span className="text-sm text-[var(--color-on-surface-variant)]">PM</span>
+    <aside className="w-[248px] shrink-0 bg-[var(--color-surface-container-low)] hidden md:flex flex-col m-2 rounded-xl overflow-hidden">
+      {/* Logo */}
+      <div className="h-16 flex items-center justify-center gap-2.5 px-4">
+        <Image src="/logo.png" alt="Metland" width={96} height={16} priority className="h-[16px] w-auto" />
+        <span className="text-[11px] font-semibold text-[var(--color-on-surface-variant)] bg-[var(--color-surface-container-high)] px-1.5 py-0.5 rounded-sm tracking-wide">
+          PM
+        </span>
       </div>
-      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+
+      {/* Nav */}
+      <nav className="flex-1 px-2 pt-4 pb-2 space-y-px overflow-y-auto">
         {nav.map((n) => {
           const active = isActive(n.href);
           return (
             <Link
               key={n.href}
               href={n.href}
-              className={`flex items-center gap-2.5 h-[38px] px-3 rounded text-sm ${
+              className={`flex items-center gap-2.5 h-9 px-2.5 rounded-md text-sm transition-colors duration-150 ${
                 active
-                  ? "bg-[var(--color-secondary-container)] text-[var(--color-on-secondary-container)] font-semibold"
-                  : "text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container)]"
+                  ? "bg-[var(--color-secondary-container)] text-[var(--color-on-secondary-container)] font-medium"
+                  : "text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container)] hover:text-[var(--color-on-surface)]"
               }`}
             >
-              <n.icon size={16} className="shrink-0" />
+              <n.icon size={15} className="shrink-0 opacity-75" />
               {n.label}
             </Link>
           );
         })}
-        <div className={`pt-4 mt-4 border-t border-[var(--color-outline-variant)] ${visibleAdmin.length ? "" : "hidden"}`}>
-          <div className="px-3 text-xs font-semibold tracking-widest uppercase text-[var(--color-on-surface-variant)]">Administration</div>
-          {visibleAdmin.map((a) => {
-            const active = isActive(a.href);
-            return (
-              <Link
-                key={a.href}
-                href={a.href}
-                className={`flex items-center gap-2.5 h-[38px] px-3 rounded text-sm ${
-                  active
-                    ? "bg-[var(--color-secondary-container)] text-[var(--color-on-secondary-container)] font-semibold"
-                    : "text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container)]"
-                }`}
-              >
-                <ShieldCheck size={16} />
-                {a.label}
-              </Link>
-            );
-          })}
-        </div>
+
+        {visibleAdmin.length > 0 && (
+          <div className="pt-3 mt-2 border-t border-[var(--color-outline-variant)]">
+            <div className="px-2.5 pb-1.5 text-[11px] font-medium text-[var(--color-outline)] tracking-wide">
+              Administration
+            </div>
+            {visibleAdmin.map((a) => {
+              const active = isActive(a.href);
+              return (
+                <Link
+                  key={a.href}
+                  href={a.href}
+                  className={`flex items-center gap-2.5 h-9 px-2.5 rounded-md text-sm transition-colors duration-150 ${
+                    active
+                      ? "bg-[var(--color-secondary-container)] text-[var(--color-on-secondary-container)] font-medium"
+                      : "text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container)] hover:text-[var(--color-on-surface)]"
+                  }`}
+                >
+                  <a.icon size={15} className="shrink-0 opacity-75" />
+                  {a.label}
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </nav>
-      <div className="m-3 p-3.5 rounded-lg bg-[var(--color-surface-container-low)] border border-[var(--color-outline-variant)]">
-        <div className="text-xs font-semibold tracking-widest uppercase text-[var(--color-outline)]">Periode laporan</div>
-        <div className="mt-1.5 font-mono text-[13px] text-[var(--color-on-surface)]">{reportPeriod()}</div>
+
+      {/* Report period */}
+      <div className="px-3.5 py-2 border-t border-[var(--color-outline-variant)]">
+        <p className="text-[11px] text-[var(--color-outline)]">
+          <span className="font-medium text-[var(--color-on-surface-variant)]">Periode</span>{" "}
+          {reportPeriod()}
+        </p>
       </div>
-      <div className="p-3 border-t border-[var(--color-outline-variant)] flex items-center gap-2.5">
-        <div className="w-[34px] h-[34px] rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center text-[13px] font-semibold flex-none">
+
+      {/* User */}
+      <div className="px-3 py-2.5 border-t border-[var(--color-outline-variant)] flex items-center gap-2.5">
+        <div className="w-7 h-7 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center text-[11px] font-semibold flex-none select-none">
           {initials}
         </div>
-        <div className="min-w-0">
-          <div className="text-[13px] font-semibold text-[var(--color-on-surface)] overflow-hidden text-ellipsis whitespace-nowrap">{user?.name ?? "Pengguna"}</div>
-          <div className="text-xs text-[var(--color-outline)]">{user?.role ?? "Project Manager"}</div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[13px] font-medium text-[var(--color-on-surface)] truncate leading-snug">
+            {user?.name ?? "Pengguna"}
+          </div>
+          <div className="text-[11px] text-[var(--color-outline)] leading-snug">
+            {user?.role ?? "Project Manager"}
+          </div>
         </div>
         <LogoutButton />
       </div>

@@ -12,15 +12,15 @@ export function AppSwitcher() {
   ];
 
   return (
-    <div className="flex gap-0 p-1 bg-[var(--color-surface-container)] rounded-lg">
+    <div className="flex gap-0 p-1 bg-[var(--color-surface-container-high)] rounded-md w-full">
       {apps.map((a) => (
         <Link
           key={a.name}
           href={a.href}
-          className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+          className={`flex-1 text-center px-2 py-1.5 text-xs font-medium rounded-sm transition-colors ${
             a.active
-              ? "bg-[var(--color-primary)] text-white shadow-sm"
-              : "text-[var(--color-on-surface-variant,#6b7280)] hover:text-[var(--color-on-surface,#111)]"
+              ? "bg-white text-[var(--color-on-surface)] shadow-sm"
+              : "text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)]"
           }`}
         >
           {a.name}
