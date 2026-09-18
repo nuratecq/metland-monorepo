@@ -1,7 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { LayoutList, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { Table, Th, Td } from "@metland/ui";
 import { HEALTH_STYLE, PROJECT_STATUS_LABEL } from "@/lib/status-styles";
@@ -140,36 +138,7 @@ function GridView({ rows }: { rows: ProjectRow[] }) {
   );
 }
 
-export function ProjectViewToggle({ rows }: { rows: ProjectRow[] }) {
-  const [view, setView] = useState<"list" | "grid">("list");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const saved = localStorage.getItem("project-view") as "list" | "grid" | null;
-    if (saved === "grid" || saved === "list") setView(saved);
-  }, []);
-
-  const toggle = () => {
-    const next = view === "list" ? "grid" : "list";
-    setView(next);
-    localStorage.setItem("project-view", next);
-  };
-
-  const isGrid = mounted && view === "grid";
-
-  return (
-    <div>
-      <div className="flex items-center justify-end px-4 py-2 border-b border-[var(--color-outline-variant)]">
-        <button
-          onClick={toggle}
-          title={isGrid ? "Switch to list view" : "Switch to grid view"}
-          className="w-8 h-8 flex items-center justify-center rounded hover:bg-[var(--color-surface-container)] text-[var(--color-on-surface-variant)] transition-colors"
-        >
-          {isGrid ? <LayoutList size={16} /> : <LayoutGrid size={16} />}
-        </button>
-      </div>
-      {isGrid ? <GridView rows={rows} /> : <ListView rows={rows} />}
-    </div>
-  );
+export function ProjectViewToggle({ rows, view }: { rows: ProjectRow[]; view: string }) {
+  const isGrid = view === "grid";
+  return isGrid ? <GridView rows={rows} /> : <ListView rows={rows} />;
 }

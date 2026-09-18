@@ -171,9 +171,9 @@ export default async function EmployeesPage() {
         ].map((s) => (
           <div
             key={s.label}
-            className="bg-white border border-[var(--color-outline-variant)] rounded-lg p-4"
+            className="bg-white rounded-xl shadow-sm p-4"
           >
-            <div className="text-xs font-semibold tracking-wide uppercase text-[var(--color-outline)]">
+            <div className="text-[13px] font-medium text-[var(--color-on-surface-variant)]">
               {s.label}
             </div>
             <div
@@ -188,7 +188,7 @@ export default async function EmployeesPage() {
 
       {/* Employee table */}
       {employees.length === 0 ? (
-        <div className="rounded-lg border border-[var(--color-outline-variant)] bg-white text-center py-16 px-5">
+        <div className="rounded-xl shadow-sm bg-white text-center py-16 px-5">
           <Users size={36} className="mx-auto text-[var(--color-outline-variant)] mb-3" />
           <p className="text-[15px] font-semibold text-[var(--color-on-surface)]">
             Belum ada karyawan aktif
@@ -198,23 +198,23 @@ export default async function EmployeesPage() {
           </p>
         </div>
       ) : (
-        <div className="rounded-lg border border-[var(--color-outline-variant)] bg-white overflow-x-auto">
+        <div className="rounded-xl shadow-sm bg-white overflow-x-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="border-b border-[var(--color-outline-variant)] bg-[var(--color-surface-container-low)]">
-                <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-[var(--color-outline)] w-[240px]">
+                <th className="px-4 py-3 text-left text-[11px] font-medium text-[var(--color-on-surface-variant)] w-[240px]">
                   Karyawan
                 </th>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-[var(--color-outline)]">
+                <th className="px-4 py-3 text-left text-[11px] font-medium text-[var(--color-on-surface-variant)]">
                   Role
                 </th>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-[var(--color-outline)]">
+                <th className="px-4 py-3 text-left text-[11px] font-medium text-[var(--color-on-surface-variant)]">
                   Status
                 </th>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-[var(--color-outline)]">
+                <th className="px-4 py-3 text-left text-[11px] font-medium text-[var(--color-on-surface-variant)]">
                   Projects
                 </th>
-                <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wide uppercase text-[var(--color-outline)] w-[160px]">
+                <th className="px-4 py-3 text-left text-[11px] font-medium text-[var(--color-on-surface-variant)] w-[160px]">
                   Workload
                 </th>
               </tr>
@@ -226,7 +226,7 @@ export default async function EmployeesPage() {
                 return (
                   <tr
                     key={emp.id}
-                    className={`border-b border-[var(--color-outline-variant)] last:border-0 hover:bg-[var(--color-surface-container-low)] transition-colors${idx % 2 === 1 ? " bg-[var(--color-surface)]" : ""}`}
+                    className="border-b border-[var(--color-outline-variant)] last:border-0 hover:bg-[var(--color-surface-container-low)] transition-colors"
                   >
                     {/* Name + email */}
                     <td className="px-4 py-3">
