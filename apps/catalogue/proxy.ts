@@ -6,7 +6,7 @@ import { CATALOGUE_PERM_RULES } from "@/lib/perm-rules";
 
 const hits = new Map<string, { count: number; reset: number }>();
 function rateLimit(req: NextRequest): boolean {
-  const ip = req.headers.get("x-forwarded-for") ?? "local";
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? req.headers.get("x-real-ip") ?? "local";
   const now = Date.now();
   const entry = hits.get(ip);
   if (!entry || now > entry.reset) { hits.set(ip, { count: 1, reset: now + 60000 }); return true; }
